@@ -129,17 +129,17 @@
     text-transform: capitalize;
 }
 
-.offer-status.active {
+.offer-status.live {
     background: rgba(76, 175, 80, 0.15);
     color: #4CAF50;
 }
 
-.offer-status.pending {
+.offer-status.paused {
     background: rgba(255, 152, 0, 0.15);
     color: #FF9800;
 }
 
-.offer-status.paused {
+.offer-status.draft {
     background: rgba(96, 125, 139, 0.15);
     color: #607D8B;
 }
@@ -229,11 +229,11 @@
 }
 
 .offer-form-row.three-col {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .offer-form-row.two-col {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .offer-form-actions {
