@@ -1,0 +1,641 @@
+.offer-page {
+    animation: fadeIn 0.3s ease;
+}
+
+.offer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.offer-header-left h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.offer-header-left p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.offer-filters {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.offer-search {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+    max-width: 400px;
+}
+
+.offer-search input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    background: var(--bg-secondary);
+    transition: var(--transition-fast);
+}
+
+.offer-search input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.offer-search svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    width: 18px;
+    height: 18px;
+}
+
+.offer-filter-select {
+    min-width: 150px;
+}
+
+.offer-table-container {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.offer-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.offer-table th,
+.offer-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.offer-table th {
+    background: var(--bg-primary);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.offer-table tbody tr {
+    transition: var(--transition-fast);
+}
+
+.offer-table tbody tr:hover {
+    background: rgba(33, 150, 243, 0.03);
+}
+
+.offer-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.offer-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.offer-id {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.offer-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    text-transform: capitalize;
+}
+
+.offer-status.active {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+}
+
+.offer-status.pending {
+    background: rgba(255, 152, 0, 0.15);
+    color: #FF9800;
+}
+
+.offer-status.paused {
+    background: rgba(96, 125, 139, 0.15);
+    color: #607D8B;
+}
+
+.offer-status.expired {
+    background: rgba(244, 67, 54, 0.15);
+    color: #F44336;
+}
+
+.offer-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.offer-action-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-secondary);
+}
+
+.offer-action-btn:hover {
+    background: var(--primary-color);
+    color: var(--text-white);
+}
+
+.offer-action-btn.delete:hover {
+    background: var(--danger-color);
+}
+
+.offer-action-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* New/Edit Offer Form */
+.offer-form-container {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 32px;
+}
+
+.offer-form-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.offer-form-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.offer-form-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.offer-form-section {
+    margin-bottom: 32px;
+}
+
+.offer-form-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.offer-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.offer-form-row.three-col {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.offer-form-row.two-col {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.offer-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-light);
+}
+
+/* Pagination */
+.offer-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-primary);
+}
+
+.offer-pagination-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.offer-pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.offer-pagination-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    transition: var(--transition-fast);
+}
+
+.offer-pagination-btn:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.offer-pagination-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--text-white);
+}
+
+.offer-pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Delete Modal */
+.delete-modal {
+    text-align: center;
+}
+
+.delete-modal-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: rgba(244, 67, 54, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--danger-color);
+}
+
+.delete-modal-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+.delete-modal h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.delete-modal p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.delete-modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* Collapsible Sections */
+.collapsible-section {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: var(--bg-primary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.collapsible-header:hover {
+    background: rgba(33, 150, 243, 0.05);
+}
+
+.collapsible-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.collapsible-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+.collapsible-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.collapsible-content {
+    padding: 24px;
+}
+
+/* Checkbox & Radio Groups */
+.checkbox-group,
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.checkbox-item,
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 12px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.checkbox-item:hover,
+.radio-item:hover {
+    background: rgba(33, 150, 243, 0.08);
+}
+
+.checkbox-item input,
+.radio-item input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.checkbox-item span,
+.radio-item span {
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+/* Input with Action Button */
+.input-with-action {
+    display: flex;
+    gap: 8px;
+}
+
+.input-with-action .form-control {
+    flex: 1;
+}
+
+.btn-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-secondary);
+}
+
+.btn-icon:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Targeting & Capping Subsections */
+.targeting-subsection,
+.capping-subsection {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.targeting-subsection:last-child,
+.capping-subsection:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.targeting-subsection h4,
+.capping-subsection h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Form helper text */
+.form-helper {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+/* Form error text */
+.form-error {
+    font-size: 12px;
+    color: var(--danger-color);
+    margin-top: 6px;
+}
+
+/* Switch Label */
+.switch-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.switch-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.switch-label span {
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+/* OS Targeting Grid */
+.os-targeting-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.os-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.form-control-sm {
+    padding: 6px 10px;
+    font-size: 13px;
+    height: 32px;
+}
+
+/* Section Badge */
+.section-badge {
+    background: var(--primary-color);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+
+.collapsible-title {
+    display: flex;
+    align-items: center;
+}
+
+/* Button Link */
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.btn-link:hover {
+    color: var(--primary-dark);
+}
+
+/* Offer Header Actions */
+.offer-header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Button Sizes */
+.btn-lg {
+    padding: 14px 28px;
+    font-size: 16px;
+}
+
+/* Button Outline Improvements */
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-outline:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(33, 150, 243, 0.05);
+}
+
+.btn-outline svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Required Field Asterisk */
+.form-label.required::after {
+    content: ' *';
+    color: var(--danger-color);
+}
+
+@media (max-width: 768px) {
+
+
+    .offer-form-row.three-col,
+    .offer-form-row.two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .offer-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .offer-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .offer-search {
+        max-width: none;
+    }
+}
+
+/* Loading Spinner Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

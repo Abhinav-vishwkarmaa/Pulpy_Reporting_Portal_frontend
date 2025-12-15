@@ -1,0 +1,246 @@
+.import-page {
+    animation: fadeIn 0.3s ease;
+}
+
+.import-header {
+    margin-bottom: 24px;
+}
+
+.import-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.import-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.import-container {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 32px;
+}
+
+.import-form-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.import-form-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.import-form-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.import-section {
+    margin-bottom: 32px;
+}
+
+.import-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.import-dropzone {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 60px 40px;
+    text-align: center;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    background: var(--bg-primary);
+}
+
+.import-dropzone:hover {
+    border-color: var(--primary-color);
+    background: rgba(33, 150, 243, 0.05);
+}
+
+.import-dropzone.active {
+    border-color: var(--primary-color);
+    background: rgba(33, 150, 243, 0.08);
+}
+
+.import-dropzone-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    background: rgba(33, 150, 243, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.import-dropzone-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.import-dropzone h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.import-dropzone p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.import-dropzone input[type="file"] {
+    display: none;
+}
+
+.import-file-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    margin-top: 20px;
+}
+
+.import-file-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(76, 175, 80, 0.15);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--success-color);
+}
+
+.import-file-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.import-file-details {
+    flex: 1;
+}
+
+.import-file-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.import-file-size {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.import-file-remove {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(244, 67, 54, 0.1);
+    border-radius: 50%;
+    color: var(--danger-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+
+.import-file-remove:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+.import-file-remove svg {
+    width: 18px;
+    height: 18px;
+}
+
+.import-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.import-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    border: 2px solid transparent;
+}
+
+.import-option:hover {
+    border-color: var(--primary-color);
+}
+
+.import-option input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+}
+
+.import-option-label {
+    flex: 1;
+}
+
+.import-option-label strong {
+    display: block;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.import-option-label span {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.import-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-light);
+}
+
+.import-template-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.import-template-link:hover {
+    text-decoration: underline;
+}
+
+.import-template-link svg {
+    width: 18px;
+    height: 18px;
+}
