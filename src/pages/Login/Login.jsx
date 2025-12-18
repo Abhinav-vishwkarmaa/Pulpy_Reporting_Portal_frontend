@@ -31,8 +31,8 @@ function Login() {
         <div className="login-page">
             <div className="login-left">
                 <div className="login-brand">
-                    <div className="login-logo">B</div>
-                    <h1>BNG Offer</h1>
+                    <div className="login-logo">P</div>
+                    <h1>Pulpy Reporting Portal</h1>
                     <p>Affiliate Management Platform</p>
                 </div>
 
@@ -76,7 +76,6 @@ function Login() {
                                 />
                                 Remember me
                             </label>
-                            <a href="#" className="login-forgot">Forgot Password?</a>
                         </div>
 
                         <button type="submit" className="login-btn" disabled={loading}>
@@ -84,10 +83,7 @@ function Login() {
                         </button>
                     </form>
 
-                    <div className="login-demo">
-                        <p>Demo Credentials:</p>
-                        <code>kunal@blackngreen.com / Bbipin#1234</code>
-                    </div>
+            
                 </div>
             </div>
 

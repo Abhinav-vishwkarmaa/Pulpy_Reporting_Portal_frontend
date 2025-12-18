@@ -1,5 +1,6 @@
 .offer-page {
     animation: fadeIn 0.3s ease;
+    padding: 20px;
 }
 
 .offer-header {
@@ -147,6 +148,10 @@
 .offer-status.expired {
     background: rgba(244, 67, 54, 0.15);
     color: #F44336;
+}
+.offer-status.approved {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
 }
 
 .offer-actions {
@@ -638,4 +643,15 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Small loading spinner */
+.loading-spinner-small {
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
 }

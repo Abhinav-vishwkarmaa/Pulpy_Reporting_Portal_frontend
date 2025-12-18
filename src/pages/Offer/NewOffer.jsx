@@ -407,7 +407,7 @@ function NewOffer() {
             window.open(urlToTest, '_blank');
         } else {
             toast.error('Please enter an Offer URL first');
-        }
+        }   
     };
 
     const handleSubmit = async (e) => {
@@ -485,7 +485,6 @@ function NewOffer() {
                 daily_cap: formData.capping_type === 'daily' && formData.daily_cap ? parseInt(formData.daily_cap) : null,
                 weekly_cap: formData.capping_type === 'weekly' && formData.weekly_cap ? parseInt(formData.weekly_cap) : null,
                 monthly_cap: formData.capping_type === 'monthly' && formData.monthly_cap ? parseInt(formData.monthly_cap) : null,
-                total_cap: formData.capping_type === 'total' && formData.total_cap ? parseInt(formData.total_cap) : null,
                 conversion_cap: formData.capping_type === 'none' && formData.conversion_cap ? parseInt(formData.conversion_cap) : null,
                 budget_cap: formData.budget_cap ? parseFloat(formData.budget_cap) : null,
                 cap_action: formData.cap_action || 'pause',
@@ -624,10 +623,10 @@ function NewOffer() {
                             <div className="form-group">
                                 <label className="form-label required">Category</label>
                                 {!showCustomCategory ? (
-                                    <select
-                                        className="form-control"
-                                        name="category"
-                                        value={formData.category}
+                                <select
+                                    className="form-control"
+                                    name="category"
+                                    value={formData.category}
                                         onChange={(e) => {
                                             if (e.target.value === '__custom__') {
                                                 setShowCustomCategory(true);
@@ -637,13 +636,13 @@ function NewOffer() {
                                             }
                                         }}
                                         required
-                                    >
-                                        <option value="">Select Category</option>
-                                        {categories.map(cat => (
-                                            <option key={cat} value={cat}>{cat}</option>
-                                        ))}
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
                                         <option value="__custom__">+ Add Custom Category</option>
-                                    </select>
+                                </select>
                                 ) : (
                                     <div style={{ display: 'flex', gap: '10px' }}>
                                         <input
@@ -667,7 +666,7 @@ function NewOffer() {
                                         >
                                             Cancel
                                         </button>
-                                    </div>
+                            </div>
                                 )}
                             </div>
                             <div className="form-group">
@@ -807,6 +806,7 @@ function NewOffer() {
                                 >
                                     <option value="live">Live (Take Live Now)</option>
                                     <option value="paused">Pause</option>
+                                    <option value="draft">Draft</option>
                                 </select>
                             </div>
                         </div>
@@ -1169,57 +1169,57 @@ function NewOffer() {
                             {formData.capping_type === 'daily' && (
                                 <div className="form-group">
                                     <label className="form-label">Daily Cap</label>
-                                    <input
+                                <input
                                         type="number"
-                                        className="form-control"
+                                    className="form-control"
                                         name="daily_cap"
                                         value={formData.daily_cap}
-                                        onChange={handleChange}
+                                    onChange={handleChange}
                                         placeholder="1000"
-                                    />
-                                </div>
+                                />
+                            </div>
                             )}
                             
                             {formData.capping_type === 'weekly' && (
-                                <div className="form-group">
+                            <div className="form-group">
                                     <label className="form-label">Weekly Cap</label>
-                                    <input
+                                <input
                                         type="number"
-                                        className="form-control"
+                                    className="form-control"
                                         name="weekly_cap"
                                         value={formData.weekly_cap || ''}
-                                        onChange={handleChange}
+                                    onChange={handleChange}
                                         placeholder="5000"
-                                    />
-                                </div>
+                                />
+                            </div>
                             )}
                             
                             {formData.capping_type === 'monthly' && (
-                                <div className="form-group">
+                            <div className="form-group">
                                     <label className="form-label">Monthly Cap</label>
-                                    <input
+                                <input
                                         type="number"
-                                        className="form-control"
+                                    className="form-control"
                                         name="monthly_cap"
                                         value={formData.monthly_cap}
-                                        onChange={handleChange}
+                                    onChange={handleChange}
                                         placeholder="20000"
-                                    />
-                                </div>
+                                />
+                            </div>
                             )}
                             
                             {formData.capping_type === 'total' && (
-                                <div className="form-group">
+                            <div className="form-group">
                                     <label className="form-label">Total Cap</label>
-                                    <input
+                                <input
                                         type="number"
-                                        className="form-control"
+                                    className="form-control"
                                         name="total_cap"
                                         value={formData.total_cap}
-                                        onChange={handleChange}
+                                    onChange={handleChange}
                                         placeholder="50000"
-                                    />
-                                </div>
+                                />
+                            </div>
                             )}
                             
                             {formData.capping_type === 'none' && (
@@ -1277,10 +1277,9 @@ function NewOffer() {
                                         onChange={handleChange}
                                     >
                                         <option value="nocap">No Capping</option>
-                                        <option value="day">day</option>
-                                        <option value="hourly">hourly</option>
-                                        <option value="week">week</option>
-                                        <option value="month">month</option>
+                                        <option value="daily">daily</option>
+                                        <option value="weekly">weekly</option>
+                                        <option value="monthly">monthly</option>
                                     </select>
                                 </div>
                                 <div style={{ flex: '0 0 38%' }}>
@@ -1309,10 +1308,9 @@ function NewOffer() {
                                         onChange={handleChange}
                                     >
                                         <option value="nocap">No Capping</option>
-                                        <option value="day">day</option>
-                                        <option value="hourly">hourly</option>
-                                        <option value="week">week</option>
-                                        <option value="month">month</option>
+                                        <option value="daily">daily</option>
+                                        <option value="weekly">weekly</option>
+                                        <option value="monthly">monthly</option>
                                     </select>
                                 </div>
                                 <div style={{ flex: '0 0 38%' }}>
