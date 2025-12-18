@@ -444,8 +444,6 @@ function Dashboard() {
                                         setOffersError(null);
                                         const response = await offersAPI.getOffers({
                                             type: 'live',
-                                            category: 'Shopping',
-                                            advertiser_id: 1,
                                             page: 1,
                                             limit: 20
                                         });
