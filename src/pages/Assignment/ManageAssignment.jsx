@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import { assignmentsAPI, offersAPI, publishersAPI } from '../../services/api';
+import { copyToClipboard as safeCopyToClipboard } from '../../utils/clipboard';
 import './Assignment.css';
 
 // Icons
@@ -153,12 +154,11 @@ function ManageAssignment() {
     };
 
     const handleCopyTrackingUrl = async (trackingUrl) => {
-        try {
-            await navigator.clipboard.writeText(trackingUrl);
+        const result = await safeCopyToClipboard(trackingUrl);
+        if (result.success) {
             toast.success('Tracking URL copied to clipboard!');
-        } catch (err) {
-            console.error('Error copying to clipboard:', err);
-            toast.error('Failed to copy to clipboard');
+        } else {
+            toast.error(result.error || 'Failed to copy to clipboard');
         }
     };
 

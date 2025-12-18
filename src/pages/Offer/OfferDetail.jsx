@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { offersAPI, publishersAPI, assignmentsAPI } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { copyToClipboard as safeCopyToClipboard } from '../../utils/clipboard';
 import './Offer.css';
 
 const ArrowLeftIcon = () => (
@@ -796,9 +797,13 @@ function OfferDetail() {
                                                             <button
                                                                 type="button"
                                                                 className="btn btn-success btn-sm"
-                                                                onClick={() => {
-                                                                    navigator.clipboard.writeText(assignment.tracking_url);
-                                                                    toast.success('Copied to clipboard!');
+                                                                onClick={async () => {
+                                                                    const result = await safeCopyToClipboard(assignment.tracking_url);
+                                                                    if (result.success) {
+                                                                        toast.success('Copied to clipboard!');
+                                                                    } else {
+                                                                        toast.error(result.error || 'Failed to copy to clipboard');
+                                                                    }
                                                                 }}
                                                                 style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
                                                             >

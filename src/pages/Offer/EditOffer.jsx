@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import { offersAPI, advertisersAPI, assignmentsAPI, publishersAPI } from '../../services/api';
+import { copyToClipboard as safeCopyToClipboard } from '../../utils/clipboard';
 import './Offer.css';
 
 // Country and Currency data - matching HTML
@@ -588,9 +589,13 @@ function EditOffer() {
         });
     };
 
-    const copyToClipboard = (text) => {
-        navigator.clipboard.writeText(text);
-        toast.success('Copied to clipboard!');
+    const copyToClipboard = async (text) => {
+        const result = await safeCopyToClipboard(text);
+        if (result.success) {
+            toast.success('Copied to clipboard!');
+        } else {
+            toast.error(result.error || 'Failed to copy to clipboard');
+        }
     };
 
     const generateTrackingUrl = () => {
