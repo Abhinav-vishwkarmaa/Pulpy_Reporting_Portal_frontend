@@ -86,11 +86,21 @@ function Dashboard() {
     const { user } = useAuth();
     const { getStats, offers, affiliates } = useData();
     const [dashboardData, setDashboardData] = useState(null);
+    const [topOffers, setTopOffers] = useState([]);
+    const [performanceData, setPerformanceData] = useState([]);
+    const [topAffiliates, setTopAffiliates] = useState([]);
+    const [infoCards, setInfoCards] = useState(null);
+    const [topCountries, setTopCountries] = useState([]);
     const [summaryData, setSummaryData] = useState(null);
     const [detailedData, setDetailedData] = useState(null);
     const [publisherData, setPublisherData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [topOffersLoading, setTopOffersLoading] = useState(false);
+    const [performanceLoading, setPerformanceLoading] = useState(false);
+    const [topAffiliatesLoading, setTopAffiliatesLoading] = useState(false);
+    const [infoCardsLoading, setInfoCardsLoading] = useState(false);
+    const [topCountriesLoading, setTopCountriesLoading] = useState(false);
     const [summaryLoading, setSummaryLoading] = useState(false);
     const [summaryError, setSummaryError] = useState(null);
     const [detailedLoading, setDetailedLoading] = useState(false);
@@ -121,6 +131,76 @@ function Dashboard() {
                 setError(err.message || 'Failed to load dashboard data');
             } finally {
                 setLoading(false);
+            }
+        };
+
+        const fetchTopOffers = async () => {
+            try {
+                setTopOffersLoading(true);
+                const response = await dashboardAPI.getTopOffers();
+                if (response.success) {
+                    setTopOffers(response.data || []);
+                }
+            } catch (err) {
+                console.error('Top offers fetch error:', err);
+            } finally {
+                setTopOffersLoading(false);
+            }
+        };
+
+        const fetchPerformance = async () => {
+            try {
+                setPerformanceLoading(true);
+                const response = await dashboardAPI.getPerformance();
+                if (response.success) {
+                    setPerformanceData(response.data || []);
+                }
+            } catch (err) {
+                console.error('Performance fetch error:', err);
+            } finally {
+                setPerformanceLoading(false);
+            }
+        };
+
+        const fetchTopAffiliates = async () => {
+            try {
+                setTopAffiliatesLoading(true);
+                const response = await dashboardAPI.getTopAffiliates();
+                if (response.success) {
+                    setTopAffiliates(response.data || []);
+                }
+            } catch (err) {
+                console.error('Top affiliates fetch error:', err);
+            } finally {
+                setTopAffiliatesLoading(false);
+            }
+        };
+
+        const fetchInfoCards = async () => {
+            try {
+                setInfoCardsLoading(true);
+                const response = await dashboardAPI.getInfoCards();
+                if (response.success) {
+                    setInfoCards(response.data);
+                }
+            } catch (err) {
+                console.error('Info cards fetch error:', err);
+            } finally {
+                setInfoCardsLoading(false);
+            }
+        };
+
+        const fetchTopCountries = async () => {
+            try {
+                setTopCountriesLoading(true);
+                const response = await dashboardAPI.getTopCountries();
+                if (response.success) {
+                    setTopCountries(response.data || []);
+                }
+            } catch (err) {
+                console.error('Top countries fetch error:', err);
+            } finally {
+                setTopCountriesLoading(false);
             }
         };
 
@@ -173,10 +253,7 @@ function Dashboard() {
             try {
                 setPublisherLoading(true);
                 setPublisherError(null);
-                const response = await dashboardAPI.getPublisherConversions({
-                    date_from: '2024-01-01',
-                    date_to: new Date().toISOString().split('T')[0]
-                });
+                const response = await dashboardAPI.getPublisherConversions();
                 if (response.success) {
                     setPublisherData(response.data);
                 } else {
@@ -241,12 +318,17 @@ function Dashboard() {
         };
 
         fetchDashboardData();
+        fetchTopOffers();
+        fetchTopAffiliates();
+        fetchInfoCards();
+        fetchTopCountries();
         fetchSummaryData();
         fetchDetailedData();
         fetchPublisherData();
         fetchOffersData();
         fetchAffiliatesData();
     }, []);
+
 
     // Fallback to local stats if API data not available
     const stats = getStats();
@@ -262,6 +344,28 @@ function Dashboard() {
     const formatCurrency = (amount) => {
         if (amount === null || amount === undefined) return '$0.00';
         return `$${parseFloat(amount).toFixed(2)}`;
+    };
+
+    // Calculate trend percentage
+    const calculateTrend = (current, previous) => {
+        if (!previous || previous === 0) return null;
+        const change = ((current - previous) / previous) * 100;
+        return {
+            value: Math.abs(change).toFixed(1),
+            isPositive: change >= 0
+        };
+    };
+
+    // Format trend display component
+    const TrendIndicator = ({ current, previous }) => {
+        const trend = calculateTrend(current, previous);
+        if (trend === null) return null;
+        return (
+            <div className={`stat-trend ${trend.isPositive ? 'up' : 'down'}`}>
+                <ArrowUpIcon style={{ transform: trend.isPositive ? 'none' : 'rotate(180deg)' }} />
+                <span>{trend.value}%</span>
+            </div>
+        );
     };
 
     // Today's date formatted
@@ -323,6 +427,7 @@ function Dashboard() {
                         <span className="stat-value">{apiStats.offers?.total || stats.totalOffers || 0}</span>
                         <span className="stat-label">Total Offers</span>
                     </div>
+                    <TrendIndicator current={apiStats.offers?.total || 0} previous={0} />
                     <div className="stat-badge">{apiStats.offers?.active || stats.activeOffers || 0} Active</div>
                 </div>
 
@@ -334,6 +439,7 @@ function Dashboard() {
                         <span className="stat-value">{apiStats.publishers?.total || stats.totalAffiliates || 0}</span>
                         <span className="stat-label">Publishers</span>
                     </div>
+                    <TrendIndicator current={apiStats.publishers?.total || 0} previous={0} />
                     <div className="stat-badge">{apiStats.publishers?.active || stats.activeAffiliates || 0} Active</div>
                 </div>
 
@@ -345,6 +451,7 @@ function Dashboard() {
                         <span className="stat-value">{formatNumber(apiStats.clicks?.total || 0)}</span>
                         <span className="stat-label">Total Clicks</span>
                     </div>
+                    <TrendIndicator current={apiStats.clicks?.total || 0} previous={apiStats.clicks?.yesterday || 0} />
                     <div className="stat-badge">{formatNumber(apiStats.clicks?.unique || 0)} Unique</div>
                 </div>
 
@@ -356,6 +463,7 @@ function Dashboard() {
                         <span className="stat-value">{formatNumber(apiStats.conversions?.total || 0)}</span>
                         <span className="stat-label">Conversions</span>
                     </div>
+                    <TrendIndicator current={apiStats.conversions?.total || 0} previous={apiStats.conversions?.yesterday || 0} />
                     <div className="stat-badge">
                         {apiStats.conversions?.approved || 0} Approved
                         {apiStats.conversions?.conversion_rate !== undefined && (
@@ -372,6 +480,7 @@ function Dashboard() {
                         <span className="stat-value">{formatCurrency(apiStats.revenue?.total || 0)}</span>
                         <span className="stat-label">Total Revenue</span>
                     </div>
+                    <TrendIndicator current={apiStats.revenue?.total || 0} previous={apiStats.revenue?.yesterday || 0} />
                     <div className="stat-badge">
                         Profit: {formatCurrency(apiStats.revenue?.profit || 0)}
                     </div>
@@ -382,10 +491,11 @@ function Dashboard() {
                         <AdvertiserIcon />
                     </div>
                     <div className="stat-info">
-                        <span className="stat-value">{formatNumber(apiStats.impressions?.total || 0)}</span>
-                        <span className="stat-label">Impressions</span>
+                        <span className="stat-value">{apiStats.advertisers?.total || 0}</span>
+                        <span className="stat-label">Advertisers</span>
                     </div>
-                    <div className="stat-badge">Total Views</div>
+                    <TrendIndicator current={apiStats.advertisers?.total || 0} previous={0} />
+                    <div className="stat-badge">{apiStats.advertisers?.active || 0} Active</div>
                 </div>
             </div>
 
@@ -490,55 +600,22 @@ function Dashboard() {
                         <h3>Top Affiliates</h3>
                         <Link to="/affiliate/manage" className="view-all">View All</Link>
                     </div>
-                    {affiliatesLoading ? (
+                    {topAffiliatesLoading ? (
                         <div className="loading-spinner">Loading affiliates...</div>
-                    ) : affiliatesError ? (
-                        <div className="error-state">
-                            <p>Error: {affiliatesError}</p>
-                            <button onClick={() => {
-                                setAffiliatesError(null);
-                                // Re-fetch affiliates data
-                                const fetchAffiliatesData = async () => {
-                                    try {
-                                        setAffiliatesLoading(true);
-                                        setAffiliatesError(null);
-                                        const response = await publishersAPI.getPublishers({
-                                            status: 'active',
-                                            page: 1,
-                                            limit: 10
-                                        });
-                                        if (response.success && response.data) {
-                                            const sortedAffiliates = response.data
-                                                .sort((a, b) => b.id - a.id)
-                                                .slice(0, 4);
-                                            setAffiliatesData(sortedAffiliates);
-                                        } else {
-                                            setAffiliatesError('Failed to load affiliates data');
-                                        }
-                                    } catch (err) {
-                                        console.error('Affiliates fetch error:', err);
-                                        setAffiliatesError(err.message || 'Failed to load affiliates data');
-                                    } finally {
-                                        setAffiliatesLoading(false);
-                                    }
-                                };
-                                fetchAffiliatesData();
-                            }}>Retry</button>
-                        </div>
-                    ) : affiliatesData && affiliatesData.length > 0 ? (
+                    ) : topAffiliates && topAffiliates.length > 0 ? (
                         <div className="affiliates-list">
-                            {affiliatesData.map((aff, idx) => (
-                                <div key={aff.id} className="affiliate-row">
+                            {topAffiliates.map((aff, idx) => (
+                                <div key={aff.publisher_id} className="affiliate-row">
                                     <div className="affiliate-rank">#{idx + 1}</div>
                                     <div className="affiliate-avatar">
-                                        {(aff.first_name || aff.company_name || aff.email || 'A').charAt(0).toUpperCase()}
+                                        {(aff.publisher_name || 'A').charAt(0).toUpperCase()}
                                     </div>
                                     <div className="affiliate-info">
-                                        <span className="affiliate-name">{aff.first_name || aff.company_name || 'N/A'}</span>
-                                        <span className="affiliate-email">{aff.email}</span>
+                                        <span className="affiliate-name">{aff.publisher_name || 'N/A'}</span>
+                                        <span className="affiliate-email">{formatNumber(aff.conversions || 0)} conversions</span>
                                     </div>
-                                    <div className={`affiliate-status ${(aff.status || 'active').toLowerCase()}`}>
-                                        {aff.status || 'active'}
+                                    <div className="affiliate-status active">
+                                        {formatNumber(aff.conversions || 0)}
                                     </div>
                                 </div>
                             ))}
@@ -722,10 +799,7 @@ function Dashboard() {
                                     try {
                                         setPublisherLoading(true);
                                         setPublisherError(null);
-                                        const response = await dashboardAPI.getPublisherConversions({
-                                            date_from: '2024-01-01',
-                                            date_to: new Date().toISOString().split('T')[0]
-                                        });
+                                        const response = await dashboardAPI.getPublisherConversions();
                                         if (response.success) {
                                             setPublisherData(response.data);
                                         } else {
@@ -743,36 +817,176 @@ function Dashboard() {
                         </div>
                     ) : publisherData && publisherData.stats && publisherData.stats.length > 0 ? (
                         <div className="publisher-list">
-                            {publisherData.stats.slice(0, 3).map((pub, index) => (
-                                <div key={pub.publisher?.id || index} className="publisher-row">
+                            {publisherData.stats.slice(0, 5).map((stat, index) => (
+                                <div key={`${stat.publisher?.id}-${stat.offer?.id}-${index}`} className="publisher-row">
                                     <div className="publisher-info">
-                                        <span className="publisher-name">{pub.publisher?.company_name || 'N/A'}</span>
-                                        <span className="publisher-email">{pub.publisher?.email}</span>
-                                        <span className="publisher-country">{pub.publisher?.country}</span>
+                                        <span className="publisher-name">{stat.publisher?.company_name || stat.publisher?.email || 'N/A'}</span>
+                                        <span className="publisher-email">{stat.offer?.name || 'N/A'}</span>
+                                        <span className="publisher-country">{stat.publisher?.country || 'N/A'}</span>
                                     </div>
                                     <div className="publisher-stats">
                                         <div className="stat">
                                             <span className="stat-label">Clicks</span>
-                                            <span className="stat-value">{formatNumber(pub.clicks?.total || 0)}</span>
+                                            <span className="stat-value">{formatNumber(stat.clicks?.total || 0)}</span>
                                         </div>
                                         <div className="stat">
                                             <span className="stat-label">Conversions</span>
-                                            <span className="stat-value">{formatNumber(pub.conversions?.total || 0)}</span>
+                                            <span className="stat-value">{formatNumber(stat.conversions?.total || 0)}</span>
                                         </div>
                                         <div className="stat">
                                             <span className="stat-label">Revenue</span>
-                                            <span className="stat-value">{formatCurrency(pub.revenue?.total || 0)}</span>
+                                            <span className="stat-value">{formatCurrency(stat.revenue?.total || 0)}</span>
                                         </div>
                                         <div className="stat">
                                             <span className="stat-label">Rate</span>
-                                            <span className="stat-value">{pub.conversions?.conversion_rate?.toFixed(1) || 0}%</span>
+                                            <span className="stat-value">{stat.conversions?.conversion_rate?.toFixed(1) || 0}%</span>
                                         </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {publisherData.summary && (
+                                <div style={{ marginTop: '12px', padding: '12px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)', fontSize: '11px', color: 'var(--text-muted)' }}>
+                                    <strong>Summary:</strong> {publisherData.summary.total_publishers || 0} Publishers • {publisherData.summary.total_offers || 0} Offers • {publisherData.summary.total_combinations || 0} Combinations
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="no-data">No publisher data available</div>
+                    )}
+                </div>
+
+                {/* Top Offers */}
+                <div className="dashboard-card top-offers-card">
+                    <div className="card-header">
+                        <h3>Top Offers by Conversions</h3>
+                    </div>
+                    {topOffersLoading ? (
+                        <div className="loading-spinner">Loading top offers...</div>
+                    ) : topOffers && topOffers.length > 0 ? (
+                        <div className="offers-list">
+                            {topOffers.map((offer, idx) => (
+                                <div key={offer.offer_id} className="offer-row">
+                                    <div className="offer-info">
+                                        <span className="offer-name">{offer.offer_name || 'N/A'}</span>
+                                        <span className="offer-id">ID: {offer.offer_id}</span>
+                                    </div>
+                                    <div className="offer-meta">
+                                        <span className="offer-payout">{formatNumber(offer.conversions || 0)} conversions</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="no-data">No publisher data available</div>
+                        <div className="no-data">No top offers available</div>
+                    )}
+                </div>
+
+                {/* Performance Chart */}
+                <div className="dashboard-card performance-chart-card">
+                    <div className="card-header">
+                        <h3>Performance Chart</h3>
+                    </div>
+                    {performanceLoading ? (
+                        <div className="loading-spinner">Loading performance data...</div>
+                    ) : performanceData && performanceData.length > 0 ? (
+                        <div style={{ padding: '16px' }}>
+                            <div className="activity-table">
+                                <div className="table-header">
+                                    <span>Date</span>
+                                    <span>Clicks</span>
+                                    <span>Conversions</span>
+                                </div>
+                                {performanceData.slice(0, 10).map((item, index) => (
+                                    <div key={index} className="table-row">
+                                        <div>{item.date}</div>
+                                        <div>{formatNumber(item.clicks || 0)}</div>
+                                        <div>{formatNumber(item.conversions || 0)}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="no-data">No performance data available</div>
+                    )}
+                </div>
+
+                {/* Info Cards */}
+                <div className="dashboard-card info-cards-card">
+                    <div className="card-header">
+                        <h3>Information</h3>
+                    </div>
+                    {infoCardsLoading ? (
+                        <div className="loading-spinner">Loading info...</div>
+                    ) : infoCards ? (
+                        <div style={{ padding: '16px' }}>
+                            <div className="summary-grid">
+                                <div className="summary-item">
+                                    <span className="summary-label">Active Offers</span>
+                                    <span className="summary-value">{infoCards.active_offers || 0}</span>
+                                </div>
+                                <div className="summary-item">
+                                    <span className="summary-label">Offer Requests</span>
+                                    <span className="summary-value">{infoCards.offer_requests || 0}</span>
+                                </div>
+                                <div className="summary-item">
+                                    <span className="summary-label">Pending Affiliates</span>
+                                    <span className="summary-value">{infoCards.pending_affiliates || 0}</span>
+                                </div>
+                            </div>
+                            {infoCards.account_manager && (
+                                <div style={{ marginTop: '16px', padding: '12px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)' }}>
+                                    <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>Account Manager</div>
+                                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <div><strong>Name:</strong> {infoCards.account_manager.name || 'N/A'}</div>
+                                        {infoCards.account_manager.email && <div><strong>Email:</strong> {infoCards.account_manager.email}</div>}
+                                        {infoCards.account_manager.phone && <div><strong>Phone:</strong> {infoCards.account_manager.phone}</div>}
+                                        {infoCards.account_manager.telegram && <div><strong>Telegram:</strong> {infoCards.account_manager.telegram}</div>}
+                                        {infoCards.account_manager.skype && <div><strong>Skype:</strong> {infoCards.account_manager.skype}</div>}
+                                    </div>
+                                </div>
+                            )}
+                            {infoCards.signup_link && (
+                                <div style={{ marginTop: '12px' }}>
+                                    <a href={infoCards.signup_link} target="_blank" rel="noopener noreferrer" className="view-all" style={{ fontSize: '12px' }}>
+                                        Signup Link →
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="no-data">No info available</div>
+                    )}
+                </div>
+
+                {/* Top Countries */}
+                <div className="dashboard-card top-countries-card">
+                    <div className="card-header">
+                        <h3>Top Countries</h3>
+                    </div>
+                    {topCountriesLoading ? (
+                        <div className="loading-spinner">Loading countries...</div>
+                    ) : topCountries && topCountries.length > 0 ? (
+                        <div className="activity-table">
+                            <div className="table-header">
+                                <span>Country</span>
+                                <span>Clicks</span>
+                                <span>Conversions</span>
+                                <span>Revenue</span>
+                            </div>
+                            {topCountries.map((country, index) => (
+                                <div key={country.country_code || index} className="table-row">
+                                    <div>
+                                        <div style={{ fontWeight: '500' }}>{country.country_name || country.country_code}</div>
+                                        <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{country.country_code}</div>
+                                    </div>
+                                    <div>{formatNumber(country.clicks || 0)}</div>
+                                    <div>{formatNumber(country.conversions || 0)}</div>
+                                    <div>{formatCurrency(country.revenue || 0)}</div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="no-data">No country data available</div>
                     )}
                 </div>
             </div>

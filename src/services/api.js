@@ -1,4 +1,5 @@
-const BASE_URL = 'http://77.237.247.50:5001';
+// const BASE_URL = 'http://77.237.247.50:5001';
+const BASE_URL = 'http://localhost:5001';
 
 // Get token from localStorage
 const getToken = () => {
@@ -54,9 +55,35 @@ export const authAPI = {
 
 // Dashboard API
 export const dashboardAPI = {
+    // Main dashboard data (KPI cards)
     getDashboard: async () => {
         return apiRequest('/api/admin/reports/dashboard');
     },
+    // Top offers with conversions
+    getTopOffers: async (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return apiRequest(`/api/admin/reports/dashboard/top-offers?${queryString}`);
+    },
+    // Performance chart data
+    getPerformance: async (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return apiRequest(`/api/admin/reports/dashboard/performance?${queryString}`);
+    },
+    // Top affiliates chart
+    getTopAffiliates: async (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return apiRequest(`/api/admin/reports/dashboard/top-affiliates?${queryString}`);
+    },
+    // Info cards data
+    getInfoCards: async () => {
+        return apiRequest('/api/admin/reports/dashboard/info-cards');
+    },
+    // Top countries
+    getTopCountries: async (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return apiRequest(`/api/admin/reports/dashboard/top-countries?${queryString}`);
+    },
+    // Legacy endpoints (keeping for backward compatibility)
     getSummary: async (params = {}) => {
         const queryString = new URLSearchParams(params).toString();
         return apiRequest(`/api/admin/reports/summary?${queryString}`);
