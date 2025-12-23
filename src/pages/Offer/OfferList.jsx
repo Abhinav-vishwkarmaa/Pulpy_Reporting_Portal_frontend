@@ -56,6 +56,7 @@ function OfferList() {
     const [deleteModal, setDeleteModal] = useState({ open: false, offer: null });
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
+    const [updatingStatus, setUpdatingStatus] = useState({});
 
     // Fetch offers data
     useEffect(() => {
@@ -118,6 +119,33 @@ function OfferList() {
                 console.error('Delete error:', err);
                 toast.error('Failed to delete offer');
             }
+        }
+    };
+
+    const handleStatusChange = async (offerId, newStatus) => {
+        try {
+            setUpdatingStatus(prev => ({ ...prev, [offerId]: true }));
+            const response = await offersAPI.updateOfferStatus(offerId, newStatus);
+            
+            if (response.success) {
+                toast.success('Offer status updated successfully');
+                
+                // Refresh offers data after status update
+                const offersResponse = await offersAPI.getOffers({
+                    page: 1,
+                    limit: 100
+                });
+                if (offersResponse.success) {
+                    setOffers(offersResponse.data);
+                }
+            } else {
+                toast.error(response.message || 'Failed to update offer status');
+            }
+        } catch (err) {
+            console.error('Status update error:', err);
+            toast.error(err.message || 'Failed to update offer status');
+        } finally {
+            setUpdatingStatus(prev => ({ ...prev, [offerId]: false }));
         }
     };
 
@@ -221,9 +249,25 @@ function OfferList() {
                                     <td>{offer.start_date ? new Date(offer.start_date).toLocaleDateString() : '-'}</td>
                                     <td>{offer.end_date ? new Date(offer.end_date).toLocaleDateString() : '-'}</td>
                                     <td>
-                                        <span className={`offer-status ${offer.status.toLowerCase()}`}>
-                                            {offer.status}
-                                        </span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <select
+                                                className={`offer-status-select ${offer.status.toLowerCase()}`}
+                                                value={['live', 'paused', 'suspend'].includes(offer.status.toLowerCase()) 
+                                                    ? offer.status.toLowerCase() 
+                                                    : 'live'}
+                                                onChange={(e) => handleStatusChange(offer.id, e.target.value)}
+                                                disabled={updatingStatus[offer.id]}
+                                            >
+                                                <option value="live">Live</option>
+                                                <option value="paused">Paused</option>
+                                                <option value="suspend">Suspend</option>
+                                            </select>
+                                            {updatingStatus[offer.id] && (
+                                                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                                                    Updating...
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td>
                                         <div className="offer-actions">

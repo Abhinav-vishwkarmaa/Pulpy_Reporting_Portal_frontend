@@ -1,5 +1,5 @@
-// const BASE_URL = 'http://77.237.247.50:5001';
-const BASE_URL = 'http://localhost:5001';
+const BASE_URL = 'http://77.237.247.50:5001';
+// const BASE_URL = 'http://localhost:5001';
 
 // Get token from localStorage
 const getToken = () => {
@@ -117,6 +117,12 @@ export const offersAPI = {
         return apiRequest(`/api/admin/offers/${id}`, {
             method: 'PATCH',
             body: JSON.stringify(data),
+        });
+    },
+    updateOfferStatus: async (id, status) => {
+        return apiRequest(`/api/admin/offers/${id}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status }),
         });
     },
 };

@@ -154,6 +154,58 @@
     color: #4CAF50;
 }
 
+.offer-status-select {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    text-transform: capitalize;
+    border: 1px solid transparent;
+    transition: var(--transition-fast);
+    min-width: 100px;
+}
+
+.offer-status-select:not(:disabled):hover {
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.offer-status-select:not(:disabled):focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.offer-status-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.offer-status-select.live {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.offer-status-select.paused {
+    background: rgba(255, 152, 0, 0.15);
+    color: #FF9800;
+    border-color: rgba(255, 152, 0, 0.3);
+}
+
+.offer-status-select.suspend {
+    background: rgba(244, 67, 54, 0.15);
+    color: #F44336;
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+.offer-status-select.draft {
+    background: rgba(96, 125, 139, 0.15);
+    color: #607D8B;
+    border-color: rgba(96, 125, 139, 0.3);
+}
+
 .offer-actions {
     display: flex;
     align-items: center;
