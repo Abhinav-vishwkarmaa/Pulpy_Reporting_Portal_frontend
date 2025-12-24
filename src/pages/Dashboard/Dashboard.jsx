@@ -208,11 +208,8 @@ function Dashboard() {
             try {
                 setSummaryLoading(true);
                 setSummaryError(null);
-                const response = await dashboardAPI.getSummary({
-                    date_from: '2024-01-01',
-                    date_to: new Date().toISOString().split('T')[0],
-                    limit: 10
-                });
+                setSummaryData(null); // Clear previous data to ensure fresh fetch
+                const response = await dashboardAPI.getSummary();
                 if (response.success) {
                     setSummaryData(response.data);
                 } else {
@@ -230,12 +227,7 @@ function Dashboard() {
             try {
                 setDetailedLoading(true);
                 setDetailedError(null);
-                const response = await dashboardAPI.getDetailed({
-                    page: 1,
-                    limit: 10,
-                    date_from: '2024-01-01',
-                    date_to: new Date().toISOString().split('T')[0]
-                });
+                const response = await dashboardAPI.getDetailed();
                 if (response.success) {
                     setDetailedData(response.data);
                 } else {
@@ -644,9 +636,6 @@ function Dashboard() {
                                         setSummaryLoading(true);
                                         setSummaryError(null);
                                         const response = await dashboardAPI.getSummary({
-                                            date_from: '2024-01-01',
-                                            date_to: new Date().toISOString().split('T')[0],
-                                            limit: 10
                                         });
                                         if (response.success) {
                                             setSummaryData(response.data);
