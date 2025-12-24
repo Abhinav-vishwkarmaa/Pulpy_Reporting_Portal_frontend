@@ -1,5 +1,6 @@
-// const BASE_URL = 'http://77.237.247.50:5001';
-const BASE_URL = 'http://localhost:5001';
+// Use Vite's environment variables
+// In .env file, use VITE_API_URL=http://your-api-url
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 // Get token from localStorage
 const getToken = () => {
