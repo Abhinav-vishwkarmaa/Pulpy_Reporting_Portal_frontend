@@ -234,8 +234,8 @@ function OfferDetail() {
                         <EditIcon />
                         Edit Offer
                     </Link>
-                    <button 
-                        className="btn btn-secondary" 
+                    <button
+                        className="btn btn-secondary"
                         onClick={() => {
                             // Scroll to publisher section
                             const element = document.getElementById('publisherSection');
@@ -262,7 +262,7 @@ function OfferDetail() {
                         <div className="stat-label" style={{ color: '#666', fontSize: '14px', marginBottom: '8px' }}>Total Conversions</div>
                         <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#4CAF50' }}>{offer.statistics.total_conversions || 0}</div>
                     </div>
-                    <div className="stat-card" style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)',display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="stat-card" style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <div className="stat-label" style={{ color: '#666', fontSize: '14px', marginBottom: '8px' }}>Conversion Rate</div>
                         <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#FF9800' }}>{offer.statistics.conversion_rate?.toFixed(2) || '0.00'}%</div>
                     </div>
@@ -449,7 +449,7 @@ function OfferDetail() {
                         {publisherAssignments.map((assignment, index) => {
                             const publisher = publishers.find(p => p.id === assignment.publisher_id);
                             const isEditing = editingAssignmentIndex === index;
-                            
+
                             return (
                                 <div key={index} style={{
                                     border: '1px solid #ddd',
@@ -724,7 +724,7 @@ function OfferDetail() {
                                             <div>
                                                 <span style={{ fontSize: '12px', color: '#666' }}>Budget Cap:</span>
                                                 <p style={{ margin: '4px 0 0 0', fontWeight: '500' }}>
-                                                    {assignment.capping_budget?.amount 
+                                                    {assignment.capping_budget?.amount
                                                         ? `${offer.offer_currency} ${assignment.capping_budget.amount} / ${assignment.capping_budget.duration}`
                                                         : 'Unlimited'}
                                                 </p>
@@ -732,7 +732,7 @@ function OfferDetail() {
                                             <div>
                                                 <span style={{ fontSize: '12px', color: '#666' }}>Conversion Cap:</span>
                                                 <p style={{ margin: '4px 0 0 0', fontWeight: '500' }}>
-                                                    {assignment.capping_conversions?.amount 
+                                                    {assignment.capping_conversions?.amount
                                                         ? `${assignment.capping_conversions.amount} / ${assignment.capping_conversions.duration}`
                                                         : 'Unlimited'}
                                                 </p>
@@ -932,7 +932,7 @@ function OfferDetail() {
                             <tbody>
                                 {offer.recent_clicks.slice(0, 10).map((click) => (
                                     <tr key={click.id}>
-                                        <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{click.click_uuid?.substring(0, 8)}...</td>
+                                        <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{click.click_uuid}</td>
                                         <td>{click.publisher_email}</td>
                                         <td>{click.ip}</td>
                                         <td>{click.device_type || '-'}</td>
@@ -965,7 +965,7 @@ function OfferDetail() {
                             <tbody>
                                 {offer.recent_conversions.map((conversion) => (
                                     <tr key={conversion.id}>
-                                        <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{conversion.conversion_uuid?.substring(0, 8)}...</td>
+                                        <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{conversion.conversion_uuid}</td>
                                         <td>{conversion.publisher_email}</td>
                                         <td>
                                             <span className={`offer-status ${conversion.status?.toLowerCase()}`}>

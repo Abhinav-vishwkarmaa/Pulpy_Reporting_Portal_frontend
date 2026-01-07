@@ -264,21 +264,21 @@ function NewOffer() {
     // Function to build preview URL with tokens
     const buildPreviewUrl = (baseUrl, mappings) => {
         if (!baseUrl) return '';
-        
+
         try {
             // Split URL into parts: base, hash fragment, and existing query
             const hashIndex = baseUrl.indexOf('#');
             const queryIndex = baseUrl.indexOf('?');
-            
+
             let basePart = baseUrl;
             let hashPart = '';
             let existingQuery = '';
-            
+
             // Extract hash fragment if present
             if (hashIndex !== -1) {
                 basePart = baseUrl.substring(0, hashIndex);
                 const afterHash = baseUrl.substring(hashIndex + 1);
-                
+
                 // Check if there's a query string after the hash
                 const queryInHash = afterHash.indexOf('?');
                 if (queryInHash !== -1) {
@@ -292,7 +292,7 @@ function NewOffer() {
                 basePart = baseUrl.substring(0, queryIndex);
                 existingQuery = baseUrl.substring(queryIndex + 1);
             }
-            
+
             // Build query string from enabled mappings (without URL encoding the tokens)
             const queryParams = [];
             mappings
@@ -301,9 +301,9 @@ function NewOffer() {
                     // Don't URL encode the token values - keep them as {token}
                     queryParams.push(`${encodeURIComponent(mapping.advertiserParam)}=${mapping.platformToken}`);
                 });
-            
+
             const newQueryString = queryParams.join('&');
-            
+
             // Combine: base + hash + query
             let result = basePart;
             if (hashPart) {
@@ -312,7 +312,7 @@ function NewOffer() {
             if (newQueryString) {
                 result += `?${newQueryString}`;
             }
-            
+
             return result;
         } catch (e) {
             // If URL is invalid, just return base URL
@@ -388,7 +388,7 @@ function NewOffer() {
 
     const handleTokenMappingChange = (id, field, value) => {
         setTokenMappings(prev => {
-            const updated = prev.map(item => 
+            const updated = prev.map(item =>
                 item.id === id ? { ...item, [field]: value } : item
             );
             // Immediately update preview URL when mappings change
@@ -407,7 +407,7 @@ function NewOffer() {
             window.open(urlToTest, '_blank');
         } else {
             toast.error('Please enter an Offer URL first');
-        }   
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -469,16 +469,16 @@ function NewOffer() {
                 ip_action: formData.ip_action.toLowerCase(),
                 ip_list: formData.ip_list || null,
                 // Device Targeting
-                device_targeting_json: formData.device_targeting && formData.device_targeting.length > 0 
-                    ? JSON.stringify({ device: formData.device_targeting }) 
+                device_targeting_json: formData.device_targeting && formData.device_targeting.length > 0
+                    ? JSON.stringify({ device: formData.device_targeting })
                     : null,
                 // OS Targeting
-                os_targeting_json: formData.os_targeting && formData.os_targeting.length > 0 
-                    ? JSON.stringify({ os: formData.os_targeting }) 
+                os_targeting_json: formData.os_targeting && formData.os_targeting.length > 0
+                    ? JSON.stringify({ os: formData.os_targeting })
                     : null,
                 // Browser Targeting
-                browser_targeting_json: formData.browser_targeting && formData.browser_targeting.length > 0 
-                    ? JSON.stringify({ browser: formData.browser_targeting }) 
+                browser_targeting_json: formData.browser_targeting && formData.browser_targeting.length > 0
+                    ? JSON.stringify({ browser: formData.browser_targeting })
                     : null,
                 // Capping
                 capping_type: formData.capping_type,
@@ -490,7 +490,7 @@ function NewOffer() {
                 cap_action: formData.cap_action || 'pause',
                 // Additional capping fields for backward compatibility
                 capping_conversions: formData.capping_conversions && formData.capping_conversions_duration !== 'nocap'
-                    ? parseInt(formData.capping_conversions) 
+                    ? parseInt(formData.capping_conversions)
                     : null,
                 advertiser_capping_budget_amount: formData.advertiser_capping_budget_amount && formData.advertiser_capping_budget_duration !== 'nocap'
                     ? parseFloat(formData.advertiser_capping_budget_amount)
@@ -596,8 +596,8 @@ function NewOffer() {
                                         <option key={tz} value={tz}>{tz}</option>
                                     ))}
                                 </select>
+                            </div>
                         </div>
-                    </div>
 
                         <div className="offer-form-row three-col">
                             <div className="form-group">
@@ -623,10 +623,10 @@ function NewOffer() {
                             <div className="form-group">
                                 <label className="form-label required">Category</label>
                                 {!showCustomCategory ? (
-                                <select
-                                    className="form-control"
-                                    name="category"
-                                    value={formData.category}
+                                    <select
+                                        className="form-control"
+                                        name="category"
+                                        value={formData.category}
                                         onChange={(e) => {
                                             if (e.target.value === '__custom__') {
                                                 setShowCustomCategory(true);
@@ -636,13 +636,13 @@ function NewOffer() {
                                             }
                                         }}
                                         required
-                                >
-                                    <option value="">Select Category</option>
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
+                                    >
+                                        <option value="">Select Category</option>
+                                        {categories.map(cat => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
                                         <option value="__custom__">+ Add Custom Category</option>
-                                </select>
+                                    </select>
                                 ) : (
                                     <div style={{ display: 'flex', gap: '10px' }}>
                                         <input
@@ -666,7 +666,7 @@ function NewOffer() {
                                         >
                                             Cancel
                                         </button>
-                            </div>
+                                    </div>
                                 )}
                             </div>
                             <div className="form-group">
@@ -925,11 +925,11 @@ function NewOffer() {
                         <div className="offer-form-row" style={{ marginTop: '20px' }}>
                             <div className="form-group" style={{ width: '100%' }}>
                                 <div className="card" style={{ backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}>
-                                    <div 
-                                        className="card-header" 
-                                        style={{ 
-                                            backgroundColor: '#e6eced', 
-                                            padding: '10px 15px', 
+                                    <div
+                                        className="card-header"
+                                        style={{
+                                            backgroundColor: '#e6eced',
+                                            padding: '10px 15px',
                                             cursor: 'pointer',
                                             display: 'flex',
                                             justifyContent: 'space-between',
@@ -1165,63 +1165,63 @@ function NewOffer() {
                                     <option value="total">Total</option>
                                 </select>
                             </div>
-                            
+
                             {formData.capping_type === 'daily' && (
                                 <div className="form-group">
                                     <label className="form-label">Daily Cap</label>
-                                <input
+                                    <input
                                         type="number"
-                                    className="form-control"
+                                        className="form-control"
                                         name="daily_cap"
                                         value={formData.daily_cap}
-                                    onChange={handleChange}
+                                        onChange={handleChange}
                                         placeholder="1000"
-                                />
-                            </div>
+                                    />
+                                </div>
                             )}
-                            
+
                             {formData.capping_type === 'weekly' && (
-                            <div className="form-group">
+                                <div className="form-group">
                                     <label className="form-label">Weekly Cap</label>
-                                <input
+                                    <input
                                         type="number"
-                                    className="form-control"
+                                        className="form-control"
                                         name="weekly_cap"
                                         value={formData.weekly_cap || ''}
-                                    onChange={handleChange}
+                                        onChange={handleChange}
                                         placeholder="5000"
-                                />
-                            </div>
+                                    />
+                                </div>
                             )}
-                            
+
                             {formData.capping_type === 'monthly' && (
-                            <div className="form-group">
+                                <div className="form-group">
                                     <label className="form-label">Monthly Cap</label>
-                                <input
+                                    <input
                                         type="number"
-                                    className="form-control"
+                                        className="form-control"
                                         name="monthly_cap"
                                         value={formData.monthly_cap}
-                                    onChange={handleChange}
+                                        onChange={handleChange}
                                         placeholder="20000"
-                                />
-                            </div>
+                                    />
+                                </div>
                             )}
-                            
+
                             {formData.capping_type === 'total' && (
-                            <div className="form-group">
+                                <div className="form-group">
                                     <label className="form-label">Total Cap</label>
-                                <input
+                                    <input
                                         type="number"
-                                    className="form-control"
+                                        className="form-control"
                                         name="total_cap"
                                         value={formData.total_cap}
-                                    onChange={handleChange}
+                                        onChange={handleChange}
                                         placeholder="50000"
-                                />
-                            </div>
+                                    />
+                                </div>
                             )}
-                            
+
                             {formData.capping_type === 'none' && (
                                 <div className="form-group">
                                     <label className="form-label">Conversion Cap</label>
@@ -1235,7 +1235,7 @@ function NewOffer() {
                                     />
                                 </div>
                             )}
-                            
+
                             <div className="form-group">
                                 <label className="form-label">Budget Cap</label>
                                 <input
@@ -1248,7 +1248,7 @@ function NewOffer() {
                                     placeholder="100000.00"
                                 />
                             </div>
-                            
+
                             <div className="form-group">
                                 <label className="form-label">Cap Action</label>
                                 <select
@@ -1263,7 +1263,7 @@ function NewOffer() {
                                 </select>
                             </div>
                         </div>
-                        
+
                         {/* Advertiser Capping Budget and Capping Conversions in same row */}
                         <div className="offer-form-row" style={{ display: 'flex', gap: '20px', alignItems: 'flex-end', marginTop: '20px' }}>
                             {/* Advertiser Capping Budget */}
@@ -1296,7 +1296,7 @@ function NewOffer() {
                                     />
                                 </div>
                             </div>
-                            
+
                             {/* Capping Conversions */}
                             <div className="form-group" style={{ flex: '1', display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
                                 <div style={{ flex: '0 0 60%' }}>
@@ -1327,7 +1327,7 @@ function NewOffer() {
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Advertiser Over Capping and Affiliate Over Capping in same row */}
                         <div className="offer-form-row two-col" style={{ marginTop: '20px' }}>
                             <div className="form-group">

@@ -494,32 +494,32 @@ function EditOffer() {
                         fallback_offer_id: offer.fallback_offer_id?.toString() || '',
                         fallbackType: offer.fallback_url ? 'url' : (offer.fallback_offer_id ? 'offer' : 'url'),
                         // Capping fields
-        globalCapping: 'none',
-        globalCappingValue: '',
-        globalCappingPeriod: 'Daily',
-        affiliateCapping: 'none',
-        affiliateCappingValue: '',
-        affiliateCappingPeriod: 'Daily',
+                        globalCapping: 'none',
+                        globalCappingValue: '',
+                        globalCappingPeriod: 'Daily',
+                        affiliateCapping: 'none',
+                        affiliateCappingValue: '',
+                        affiliateCappingPeriod: 'Daily',
                         dailyClickCap: offer.daily_cap || '',
                         dailyConversionCap: offer.conversion_cap || '',
                         totalClickCap: offer.total_cap || '',
-        totalConversionCap: '',
-        sendEmailOnCap: false,
-        capEmailRecipients: '',
+                        totalConversionCap: '',
+                        sendEmailOnCap: false,
+                        capEmailRecipients: '',
                         // Advertiser Postback
                         advertiserPostbackEnabled: !!(offer.advertiser_postback_url),
                         advertiserPostbackUrl: offer.advertiser_postback_url || '',
                         advertiserPostbackMethod: offer.advertiser_postback_method || 'GET',
-        advertiserPostbackEvents: ['conversion'],
+                        advertiserPostbackEvents: ['conversion'],
                         // Postback
                         globalPostbackUrl: offer.system_postback_url || '',
                         postbackMethod: offer.system_postback_method || 'GET',
                         postbackEvents: ['conversion']
-            }));
-        } else {
-            toast.error('Offer not found');
-            navigate('/offer/list');
-        }
+                    }));
+                } else {
+                    toast.error('Offer not found');
+                    navigate('/offer/list');
+                }
             } catch (error) {
                 console.error('Error fetching offer:', error);
                 toast.error('Failed to load offer');
@@ -581,7 +581,7 @@ function EditOffer() {
         setFormData(prev => {
             const currentArray = prev[field] || [];
             return {
-            ...prev,
+                ...prev,
                 [field]: currentArray.includes(value)
                     ? currentArray.filter(v => v !== value)
                     : [...currentArray, value]
@@ -608,15 +608,15 @@ function EditOffer() {
     // Function to build preview URL with tokens
     const buildPreviewUrl = (baseUrl, mappings) => {
         if (!baseUrl) return '';
-        
+
         try {
             const hashIndex = baseUrl.indexOf('#');
             const queryIndex = baseUrl.indexOf('?');
-            
+
             let basePart = baseUrl;
             let hashPart = '';
             let existingQuery = '';
-            
+
             if (hashIndex !== -1) {
                 basePart = baseUrl.substring(0, hashIndex);
                 const afterHash = baseUrl.substring(hashIndex + 1);
@@ -631,14 +631,14 @@ function EditOffer() {
                 basePart = baseUrl.substring(0, queryIndex);
                 existingQuery = baseUrl.substring(queryIndex + 1);
             }
-            
+
             const queryParams = [];
             mappings
                 .filter(mapping => mapping.enabled)
                 .forEach(mapping => {
                     queryParams.push(`${encodeURIComponent(mapping.advertiserParam)}=${mapping.platformToken}`);
                 });
-            
+
             const newQueryString = queryParams.join('&');
             let result = basePart;
             if (hashPart) {
@@ -647,7 +647,7 @@ function EditOffer() {
             if (newQueryString) {
                 result += `?${newQueryString}`;
             }
-            
+
             return result;
         } catch (e) {
             return baseUrl;
@@ -656,7 +656,7 @@ function EditOffer() {
 
     const handleTokenMappingChange = (id, field, value) => {
         setTokenMappings(prev => {
-            const updated = prev.map(item => 
+            const updated = prev.map(item =>
                 item.id === id ? { ...item, [field]: value } : item
             );
             if (formData.offer_url && showTokenTable) {
@@ -711,7 +711,7 @@ function EditOffer() {
 
             // Format the data for API - matching NewOffer.jsx exactly
             const finalCategory = showCustomCategory ? formData.custom_category : formData.category;
-            
+
             const offerData = {
                 advertiser_id: parseInt(formData.advertiser_id),
                 name: formData.name,
@@ -737,16 +737,16 @@ function EditOffer() {
                 ip_action: formData.ip_action.toLowerCase(),
                 ip_list: formData.ip_list || null,
                 // Device Targeting
-                device_targeting_json: formData.device_targeting && formData.device_targeting.length > 0 
-                    ? JSON.stringify({ device: formData.device_targeting }) 
+                device_targeting_json: formData.device_targeting && formData.device_targeting.length > 0
+                    ? JSON.stringify({ device: formData.device_targeting })
                     : null,
                 // OS Targeting
-                os_targeting_json: formData.os_targeting && formData.os_targeting.length > 0 
-                    ? JSON.stringify({ os: formData.os_targeting }) 
+                os_targeting_json: formData.os_targeting && formData.os_targeting.length > 0
+                    ? JSON.stringify({ os: formData.os_targeting })
                     : null,
                 // Browser Targeting
-                browser_targeting_json: formData.browser_targeting && formData.browser_targeting.length > 0 
-                    ? JSON.stringify({ browser: formData.browser_targeting }) 
+                browser_targeting_json: formData.browser_targeting && formData.browser_targeting.length > 0
+                    ? JSON.stringify({ browser: formData.browser_targeting })
                     : null,
                 // Capping
                 capping_type: formData.capping_type,
@@ -764,7 +764,7 @@ function EditOffer() {
                     : null,
                 capping_conversions_duration: formData.capping_conversions_duration,
                 capping_conversions: formData.capping_conversions && formData.capping_conversions_duration !== 'nocap'
-                    ? parseInt(formData.capping_conversions) 
+                    ? parseInt(formData.capping_conversions)
                     : null,
                 advertiser_over_capping: formData.advertiser_over_capping,
                 affiliate_over_capping: formData.affiliate_over_capping,
@@ -823,157 +823,157 @@ function EditOffer() {
                     {/* Basic Information */}
                     <div className="offer-form-section">
                         <h3 className="offer-form-section-title">Basic Information</h3>
-                    <div className="offer-form-row">
-                    <div className="form-group">
-                        <label className="form-label required">Offer Name</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="Enter offer name"
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Description</label>
-                        <textarea
-                            className="form-control"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                                placeholder="Enter the campaign description"
-                                rows="2"
-                        />
-                    </div>
-                    </div>
+                        <div className="offer-form-row">
+                            <div className="form-group">
+                                <label className="form-label required">Offer Name</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Enter offer name"
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Description</label>
+                                <textarea
+                                    className="form-control"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    placeholder="Enter the campaign description"
+                                    rows="2"
+                                />
+                            </div>
+                        </div>
 
-                    <div className="offer-form-row three-col">
-                        <div className="form-group">
-                            <label className="form-label">Offer Currency</label>
-                            <select
-                                className="form-control"
-                                name="offer_currency"
-                                value={formData.offer_currency}
-                                onChange={handleChange}
-                            >
-                                {currencies.map(curr => (
-                                    <option key={curr} value={curr}>{curr}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Country</label>
-                            <select
-                                className="form-control"
-                                name="country"
-                                value={formData.country}
-                                onChange={handleChange}
-                            >
-                                {countries.map(country => (
-                                    <option key={country.code} value={country.code}>{country.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Time Zone</label>
-                            <select
-                                className="form-control"
-                                name="timezone"
-                                value={formData.timezone}
-                                onChange={handleChange}
-                            >
-                                {timeZones.map(tz => (
-                                    <option key={tz} value={tz}>{tz}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="offer-form-row three-col">
-                        <div className="form-group">
-                            <label className="form-label required">Advertiser</label>
-                            <select
-                                className="form-control"
-                                name="advertiser_id"
-                                value={formData.advertiser_id}
-                                onChange={handleChange}
-                                required
-                                disabled={loadingAdvertisers}
-                            >
-                                <option value="">
-                                    {loadingAdvertisers ? 'Loading advertisers...' : 'Select Advertiser'}
-                                </option>
-                                {advertisers.map(advertiser => (
-                                    <option key={advertiser.id} value={advertiser.id}>
-                                        {advertiser.name} {advertiser.company_name ? `(${advertiser.company_name})` : ''}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label required">Category</label>
-                            {!showCustomCategory ? (
+                        <div className="offer-form-row three-col">
+                            <div className="form-group">
+                                <label className="form-label">Offer Currency</label>
                                 <select
                                     className="form-control"
-                                    name="category"
-                                    value={formData.category}
-                                    onChange={(e) => {
-                                        if (e.target.value === '__custom__') {
-                                            setShowCustomCategory(true);
-                                            setFormData(prev => ({ ...prev, category: '', custom_category: '' }));
-                                        } else {
-                                            setFormData(prev => ({ ...prev, category: e.target.value, custom_category: '' }));
-                                        }
-                                    }}
-                                    required
+                                    name="offer_currency"
+                                    value={formData.offer_currency}
+                                    onChange={handleChange}
                                 >
-                                <option value="">Select Category</option>
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
+                                    {currencies.map(curr => (
+                                        <option key={curr} value={curr}>{curr}</option>
                                     ))}
-                                    <option value="__custom__">+ Add Custom Category</option>
-                            </select>
-                            ) : (
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <input
-                                        type="text"
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Country</label>
+                                <select
+                                    className="form-control"
+                                    name="country"
+                                    value={formData.country}
+                                    onChange={handleChange}
+                                >
+                                    {countries.map(country => (
+                                        <option key={country.code} value={country.code}>{country.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Time Zone</label>
+                                <select
+                                    className="form-control"
+                                    name="timezone"
+                                    value={formData.timezone}
+                                    onChange={handleChange}
+                                >
+                                    {timeZones.map(tz => (
+                                        <option key={tz} value={tz}>{tz}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="offer-form-row three-col">
+                            <div className="form-group">
+                                <label className="form-label required">Advertiser</label>
+                                <select
+                                    className="form-control"
+                                    name="advertiser_id"
+                                    value={formData.advertiser_id}
+                                    onChange={handleChange}
+                                    required
+                                    disabled={loadingAdvertisers}
+                                >
+                                    <option value="">
+                                        {loadingAdvertisers ? 'Loading advertisers...' : 'Select Advertiser'}
+                                    </option>
+                                    {advertisers.map(advertiser => (
+                                        <option key={advertiser.id} value={advertiser.id}>
+                                            {advertiser.name} {advertiser.company_name ? `(${advertiser.company_name})` : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label required">Category</label>
+                                {!showCustomCategory ? (
+                                    <select
                                         className="form-control"
-                                        name="custom_category"
-                                        value={formData.custom_category}
-                                        onChange={handleChange}
-                                        placeholder="Enter custom category"
-                                        required
-                                        style={{ flex: 1 }}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={() => {
-                                            setShowCustomCategory(false);
-                                            setFormData(prev => ({ ...prev, custom_category: '' }));
+                                        name="category"
+                                        value={formData.category}
+                                        onChange={(e) => {
+                                            if (e.target.value === '__custom__') {
+                                                setShowCustomCategory(true);
+                                                setFormData(prev => ({ ...prev, category: '', custom_category: '' }));
+                                            } else {
+                                                setFormData(prev => ({ ...prev, category: e.target.value, custom_category: '' }));
+                                            }
                                         }}
-                                        style={{ whiteSpace: 'nowrap' }}
+                                        required
                                     >
-                                        Cancel
-                                    </button>
-                        </div>
-                            )}
-                    </div>
-                        <div className="form-group">
-                            <label className="form-label">Offer Visibility</label>
-                            <select
-                                className="form-control"
-                                name="offer_visibility"
-                                value={formData.offer_visibility}
-                                onChange={handleChange}
-                            >
-                                <option value="PUBLIC">Public</option>
-                                <option value="PUBLICREQUIREAPPROVAL">Public Require Approval</option>
-                                <option value="PRIVATE">Private</option>
-                            </select>
-                        </div>
+                                        <option value="">Select Category</option>
+                                        {categories.map(cat => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                        <option value="__custom__">+ Add Custom Category</option>
+                                    </select>
+                                ) : (
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="custom_category"
+                                            value={formData.custom_category}
+                                            onChange={handleChange}
+                                            placeholder="Enter custom category"
+                                            required
+                                            style={{ flex: 1 }}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            onClick={() => {
+                                                setShowCustomCategory(false);
+                                                setFormData(prev => ({ ...prev, custom_category: '' }));
+                                            }}
+                                            style={{ whiteSpace: 'nowrap' }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Offer Visibility</label>
+                                <select
+                                    className="form-control"
+                                    name="offer_visibility"
+                                    value={formData.offer_visibility}
+                                    onChange={handleChange}
+                                >
+                                    <option value="PUBLIC">Public</option>
+                                    <option value="PUBLICREQUIREAPPROVAL">Public Require Approval</option>
+                                    <option value="PRIVATE">Private</option>
+                                </select>
+                            </div>
                         </div>
 
                     </div>
@@ -982,7 +982,7 @@ function EditOffer() {
                     <div className="offer-form-section">
                         <h3 className="offer-form-section-title">Pricing Information</h3>
                         <div className="offer-form-row two-col">
-                        <div className="form-group">
+                            <div className="form-group">
                                 <label className="form-label">Advertiser Model (Revenue)</label>
                                 <select
                                     className="form-control"
@@ -993,9 +993,9 @@ function EditOffer() {
                                     {revenueModels.map(model => (
                                         <option key={model} value={model}>{model}</option>
                                     ))}
-                            </select>
-                        </div>
-                        <div className="form-group">
+                                </select>
+                            </div>
+                            <div className="form-group">
                                 <label className="form-label required">Advertiser Amount</label>
                                 <input
                                     type="number"
@@ -1007,10 +1007,10 @@ function EditOffer() {
                                     placeholder="00.00"
                                     required
                                 />
+                            </div>
                         </div>
-                    </div>
                         <div className="offer-form-row two-col">
-                        <div className="form-group">
+                            <div className="form-group">
                                 <label className="form-label">Affiliate Model (Cost)</label>
                                 <select
                                     className="form-control"
@@ -1021,9 +1021,9 @@ function EditOffer() {
                                     {revenueModels.map(model => (
                                         <option key={model} value={model}>{model}</option>
                                     ))}
-                            </select>
-                        </div>
-                        <div className="form-group">
+                                </select>
+                            </div>
+                            <div className="form-group">
                                 <label className="form-label required">Affiliate Amount</label>
                                 <input
                                     type="number"
@@ -1035,7 +1035,7 @@ function EditOffer() {
                                     placeholder="00.00"
                                     required
                                 />
-                        </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1043,8 +1043,8 @@ function EditOffer() {
                     <div className="offer-form-section">
                         <h3 className="offer-form-section-title">Schedule</h3>
                         <div className="offer-form-row two-col">
-                        <div className="form-group">
-                            <label className="form-label">Start Date</label>
+                            <div className="form-group">
+                                <label className="form-label">Start Date</label>
                                 <input
                                     type="date"
                                     className="form-control"
@@ -1052,9 +1052,9 @@ function EditOffer() {
                                     value={formData.start_date}
                                     onChange={handleChange}
                                 />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Start Time</label>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Start Time</label>
                                 <input
                                     type="time"
                                     className="form-control"
@@ -1063,11 +1063,11 @@ function EditOffer() {
                                     onChange={handleChange}
                                     step="1"
                                 />
-                        </div>
+                            </div>
                         </div>
                         <div className="offer-form-row two-col">
-                        <div className="form-group">
-                            <label className="form-label">End Date</label>
+                            <div className="form-group">
+                                <label className="form-label">End Date</label>
                                 <input
                                     type="date"
                                     className="form-control"
@@ -1075,9 +1075,9 @@ function EditOffer() {
                                     value={formData.end_date}
                                     onChange={handleChange}
                                 />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">End Time</label>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">End Time</label>
                                 <input
                                     type="time"
                                     className="form-control"
@@ -1086,10 +1086,10 @@ function EditOffer() {
                                     onChange={handleChange}
                                     step="1"
                                 />
+                            </div>
                         </div>
-                    </div>
                         <div className="offer-form-row">
-                    <div className="form-group">
+                            <div className="form-group">
                                 <label className="form-label">Offer Live/Pause</label>
                                 <select
                                     className="form-control"
@@ -1100,8 +1100,8 @@ function EditOffer() {
                                     <option value="live">Live (Take Live Now)</option>
                                     <option value="paused">Pause</option>
                                     <option value="draft">Draft</option>
-                        </select>
-                    </div>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -1112,16 +1112,16 @@ function EditOffer() {
                         <div className="offer-form-row" style={{ display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
                             <div className="form-group" style={{ flex: 1 }}>
                                 <label className="form-label required">Offer URL</label>
-                        <input
-                            type="url"
-                            className="form-control"
+                                <input
+                                    type="url"
+                                    className="form-control"
                                     name="offer_url"
                                     value={formData.offer_url}
-                            onChange={handleChange}
+                                    onChange={handleChange}
                                     placeholder="https://example.com/offer"
                                     required
-                        />
-                        </div>
+                                />
+                            </div>
                             <button
                                 type="button"
                                 className="btn btn-primary"
@@ -1130,38 +1130,38 @@ function EditOffer() {
                             >
                                 🔗 Test Offer Link
                             </button>
-                    </div>
+                        </div>
                         {/* Offer URL Autocomplete */}
                         <div className="offer-form-row">
-                    <div className="form-group">
+                            <div className="form-group">
                                 <label className="form-label">Offer URL Autocomplete (with tokens)</label>
-                        <input
+                                <input
                                     type="url"
-                            className="form-control"
+                                    className="form-control"
                                     name="preview_url"
                                     value={formData.preview_url}
-                            onChange={handleChange}
+                                    onChange={handleChange}
                                     placeholder="Autocomplete offer URL"
                                     disabled
-                        />
-                    </div>
+                                />
+                            </div>
                         </div>
                         {/* Tokens */}
                         <div className="offer-form-row">
-                        <div className="form-group">
+                            <div className="form-group">
                                 <label className="form-label">Tokens</label>
                                 <select
-                                className="form-control"
+                                    className="form-control"
                                     name="token_type"
                                     value={formData.token_type}
-                                onChange={handleChange}
+                                    onChange={handleChange}
                                 >
                                     <option value="">Select Partner</option>
                                     {tokenTypes.map(token => (
                                         <option key={token} value={token}>{token}</option>
                                     ))}
                                 </select>
-                        </div>
+                            </div>
                         </div>
                         {/* Token Mappings Table */}
                         {showTokenTable && tokenMappings.length > 0 && (
@@ -1179,7 +1179,7 @@ function EditOffer() {
                                             {tokenMappings.map((mapping) => (
                                                 <tr key={mapping.id}>
                                                     <td style={{ textAlign: 'center' }}>
-                            <input
+                                                        <input
                                                             type="checkbox"
                                                             checked={mapping.enabled}
                                                             onChange={(e) => handleTokenMappingChange(mapping.id, 'enabled', e.target.checked)}
@@ -1211,18 +1211,18 @@ function EditOffer() {
                                             ))}
                                         </tbody>
                                     </table>
-                        </div>
-                    </div>
+                                </div>
+                            </div>
                         )}
                         {/* Tokens/Macros Info */}
                         <div className="offer-form-row" style={{ marginTop: '20px' }}>
                             <div className="form-group" style={{ width: '100%' }}>
                                 <div className="card" style={{ backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}>
-                                    <div 
-                                        className="card-header" 
-                                        style={{ 
-                                            backgroundColor: '#e6eced', 
-                                            padding: '10px 15px', 
+                                    <div
+                                        className="card-header"
+                                        style={{
+                                            backgroundColor: '#e6eced',
+                                            padding: '10px 15px',
                                             cursor: 'pointer',
                                             display: 'flex',
                                             justifyContent: 'space-between',
@@ -1457,7 +1457,7 @@ function EditOffer() {
                                     <option value="monthly">Monthly</option>
                                 </select>
                             </div>
-                            
+
                             {formData.capping_type === 'daily' && (
                                 <div className="form-group">
                                     <label className="form-label">Daily Cap</label>
@@ -1471,7 +1471,7 @@ function EditOffer() {
                                     />
                                 </div>
                             )}
-                            
+
                             {formData.capping_type === 'weekly' && (
                                 <div className="form-group">
                                     <label className="form-label">Weekly Cap</label>
@@ -1485,7 +1485,7 @@ function EditOffer() {
                                     />
                                 </div>
                             )}
-                            
+
                             {formData.capping_type === 'monthly' && (
                                 <div className="form-group">
                                     <label className="form-label">Monthly Cap</label>
@@ -1499,8 +1499,8 @@ function EditOffer() {
                                     />
                                 </div>
                             )}
-                            
-                            
+
+
                             {formData.capping_type === 'none' && (
                                 <div className="form-group">
                                     <label className="form-label">Conversion Cap</label>
@@ -1514,7 +1514,7 @@ function EditOffer() {
                                     />
                                 </div>
                             )}
-                            
+
                             <div className="form-group">
                                 <label className="form-label">Budget Cap</label>
                                 <input
@@ -1527,7 +1527,7 @@ function EditOffer() {
                                     placeholder="100000.00"
                                 />
                             </div>
-                            
+
                             <div className="form-group">
                                 <label className="form-label">Cap Action</label>
                                 <select
@@ -1542,7 +1542,7 @@ function EditOffer() {
                                 </select>
                             </div>
                         </div>
-                        
+
                         {/* Advertiser Capping Budget and Capping Conversions in same row */}
                         <div className="offer-form-row" style={{ display: 'flex', gap: '20px', alignItems: 'flex-end', marginTop: '20px' }}>
                             {/* Advertiser Capping Budget */}
@@ -1575,7 +1575,7 @@ function EditOffer() {
                                     />
                                 </div>
                             </div>
-                            
+
                             {/* Capping Conversions */}
                             <div className="form-group" style={{ flex: '1', display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
                                 <div style={{ flex: '0 0 60%' }}>
@@ -1606,7 +1606,7 @@ function EditOffer() {
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Advertiser Over Capping and Affiliate Over Capping in same row */}
                         <div className="offer-form-row two-col" style={{ marginTop: '20px' }}>
                             <div className="form-group">
@@ -1685,109 +1685,109 @@ function EditOffer() {
                     {/* Advertiser Postback */}
                     <div className="offer-form-section">
                         <h3 className="offer-form-section-title">Advertiser Postback</h3>
-                    <div className="form-group">
-                        <label className="switch-label">
-                            <input type="checkbox" name="advertiserPostbackEnabled" checked={formData.advertiserPostbackEnabled || false} onChange={handleChange} />
-                            <span>Enable Advertiser Postback</span>
-                        </label>
-                    </div>
+                        <div className="form-group">
+                            <label className="switch-label">
+                                <input type="checkbox" name="advertiserPostbackEnabled" checked={formData.advertiserPostbackEnabled || false} onChange={handleChange} />
+                                <span>Enable Advertiser Postback</span>
+                            </label>
+                        </div>
 
-                    {formData.advertiserPostbackEnabled && (
-                        <>
-                            <div className="form-group">
-                                <label className="form-label">Postback URL</label>
-                                <input
-                                    type="url"
-                                    className="form-control"
-                                    name="advertiserPostbackUrl"
-                                    value={formData.advertiserPostbackUrl}
-                                    onChange={handleChange}
-                                    placeholder="https://advertiser.com/postback?clickid={clickid}"
-                                />
-                                <div className="form-helper">
-                                    Macros: {'{clickid}'}, {'{payout}'}, {'{offer_id}'}, {'{affiliate_id}'}, {'{goal}'}, {'{status}'}
-                                </div>
-                            </div>
-
-                            <div className="offer-form-row two-col">
+                        {formData.advertiserPostbackEnabled && (
+                            <>
                                 <div className="form-group">
-                                    <label className="form-label">Method</label>
-                                    <select className="form-control" name="advertiserPostbackMethod" value={formData.advertiserPostbackMethod} onChange={handleChange}>
-                                        <option value="GET">GET</option>
-                                        <option value="POST">POST</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label">Events</label>
-                                    <div className="checkbox-group">
-                                        <label className="checkbox-item">
-                                            <input type="checkbox" checked={(formData.advertiserPostbackEvents || []).includes('conversion')} onChange={() => handleArrayToggle('advertiserPostbackEvents', 'conversion')} />
-                                            <span>Conversion</span>
-                                        </label>
-                                        <label className="checkbox-item">
-                                            <input type="checkbox" checked={(formData.advertiserPostbackEvents || []).includes('click')} onChange={() => handleArrayToggle('advertiserPostbackEvents', 'click')} />
-                                            <span>Click</span>
-                                        </label>
-                                        <label className="checkbox-item">
-                                            <input type="checkbox" checked={(formData.advertiserPostbackEvents || []).includes('reject')} onChange={() => handleArrayToggle('advertiserPostbackEvents', 'reject')} />
-                                            <span>Reject</span>
-                                        </label>
+                                    <label className="form-label">Postback URL</label>
+                                    <input
+                                        type="url"
+                                        className="form-control"
+                                        name="advertiserPostbackUrl"
+                                        value={formData.advertiserPostbackUrl}
+                                        onChange={handleChange}
+                                        placeholder="https://advertiser.com/postback?clickid={clickid}"
+                                    />
+                                    <div className="form-helper">
+                                        Macros: {'{clickid}'}, {'{payout}'}, {'{offer_id}'}, {'{affiliate_id}'}, {'{goal}'}, {'{status}'}
                                     </div>
                                 </div>
-                            </div>
-                        </>
-                    )}
+
+                                <div className="offer-form-row two-col">
+                                    <div className="form-group">
+                                        <label className="form-label">Method</label>
+                                        <select className="form-control" name="advertiserPostbackMethod" value={formData.advertiserPostbackMethod} onChange={handleChange}>
+                                            <option value="GET">GET</option>
+                                            <option value="POST">POST</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Events</label>
+                                        <div className="checkbox-group">
+                                            <label className="checkbox-item">
+                                                <input type="checkbox" checked={(formData.advertiserPostbackEvents || []).includes('conversion')} onChange={() => handleArrayToggle('advertiserPostbackEvents', 'conversion')} />
+                                                <span>Conversion</span>
+                                            </label>
+                                            <label className="checkbox-item">
+                                                <input type="checkbox" checked={(formData.advertiserPostbackEvents || []).includes('click')} onChange={() => handleArrayToggle('advertiserPostbackEvents', 'click')} />
+                                                <span>Click</span>
+                                            </label>
+                                            <label className="checkbox-item">
+                                                <input type="checkbox" checked={(formData.advertiserPostbackEvents || []).includes('reject')} onChange={() => handleArrayToggle('advertiserPostbackEvents', 'reject')} />
+                                                <span>Reject</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Postback */}
                     <div className="offer-form-section" id="postBackSection">
                         <h3 className="offer-form-section-title">Postback</h3>
-                    <div className="form-group">
-                        <label className="form-label">Global Postback URL</label>
-                        <div className="input-with-action">
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="globalPostbackUrl"
-                                value={formData.globalPostbackUrl}
-                                onChange={handleChange}
-                                placeholder="https://track.bngrenew.com/postback"
-                            />
-                            <button type="button" className="btn btn-icon" onClick={() => copyToClipboard(formData.globalPostbackUrl)}>
-                                <CopyIcon />
-                            </button>
-                        </div>
-                        <div className="form-helper">
-                            Macros: {'{clickid}'}, {'{payout}'}, {'{offer_id}'}, {'{affiliate_id}'}, {'{goal}'}, {'{source}'}, {'{sub1-5}'}
-                        </div>
-                    </div>
-
-                    <div className="offer-form-row two-col">
                         <div className="form-group">
-                            <label className="form-label">Method</label>
-                            <select className="form-control" name="postbackMethod" value={formData.postbackMethod} onChange={handleChange}>
-                                <option value="GET">GET</option>
-                                <option value="POST">POST</option>
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Fire Postback On</label>
-                            <div className="checkbox-group">
-                                <label className="checkbox-item">
-                                    <input type="checkbox" checked={(formData.postbackEvents || []).includes('conversion')} onChange={() => handleArrayToggle('postbackEvents', 'conversion')} />
-                                    <span>Conversion</span>
-                                </label>
-                                <label className="checkbox-item">
-                                    <input type="checkbox" checked={(formData.postbackEvents || []).includes('pending')} onChange={() => handleArrayToggle('postbackEvents', 'pending')} />
-                                    <span>Pending</span>
-                                </label>
-                                <label className="checkbox-item">
-                                    <input type="checkbox" checked={(formData.postbackEvents || []).includes('rejected')} onChange={() => handleArrayToggle('postbackEvents', 'rejected')} />
-                                    <span>Rejected</span>
-                                </label>
+                            <label className="form-label">Global Postback URL</label>
+                            <div className="input-with-action">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="globalPostbackUrl"
+                                    value={formData.globalPostbackUrl}
+                                    onChange={handleChange}
+                                    placeholder="https://track.bngrenew.com/postback"
+                                />
+                                <button type="button" className="btn btn-icon" onClick={() => copyToClipboard(formData.globalPostbackUrl)}>
+                                    <CopyIcon />
+                                </button>
+                            </div>
+                            <div className="form-helper">
+                                Macros: {'{clickid}'}, {'{payout}'}, {'{offer_id}'}, {'{affiliate_id}'}, {'{goal}'}, {'{source}'}, {'{sub1-5}'}
                             </div>
                         </div>
-                    </div>
+
+                        <div className="offer-form-row two-col">
+                            <div className="form-group">
+                                <label className="form-label">Method</label>
+                                <select className="form-control" name="postbackMethod" value={formData.postbackMethod} onChange={handleChange}>
+                                    <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Fire Postback On</label>
+                                <div className="checkbox-group">
+                                    <label className="checkbox-item">
+                                        <input type="checkbox" checked={(formData.postbackEvents || []).includes('conversion')} onChange={() => handleArrayToggle('postbackEvents', 'conversion')} />
+                                        <span>Conversion</span>
+                                    </label>
+                                    <label className="checkbox-item">
+                                        <input type="checkbox" checked={(formData.postbackEvents || []).includes('pending')} onChange={() => handleArrayToggle('postbackEvents', 'pending')} />
+                                        <span>Pending</span>
+                                    </label>
+                                    <label className="checkbox-item">
+                                        <input type="checkbox" checked={(formData.postbackEvents || []).includes('rejected')} onChange={() => handleArrayToggle('postbackEvents', 'rejected')} />
+                                        <span>Rejected</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
                         {/* Add Custom Postback */}
                         <div className="form-group" style={{ marginTop: '16px' }}>

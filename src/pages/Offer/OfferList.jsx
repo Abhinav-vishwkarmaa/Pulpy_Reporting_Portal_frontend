@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useData } from '../../context/DataContext';
+
 import { useToast } from '../../context/ToastContext';
 import { offersAPI } from '../../services/api';
 import './Offer.css';
@@ -45,7 +45,7 @@ const AlertIcon = () => (
 );
 
 function OfferList() {
-    const { deleteOffer } = useData();
+
     const toast = useToast();
     const navigate = useNavigate();
     const [offers, setOffers] = useState([]);
@@ -102,8 +102,8 @@ function OfferList() {
     const confirmDelete = async () => {
         if (deleteModal.offer) {
             try {
-                // For now, use the local delete function since we don't have a delete API endpoint
-                deleteOffer(deleteModal.offer.id);
+                // Call the API to delete the offer
+                await offersAPI.deleteOffer(deleteModal.offer.id);
                 toast.success('Offer deleted successfully');
                 setDeleteModal({ open: false, offer: null });
 
@@ -126,10 +126,10 @@ function OfferList() {
         try {
             setUpdatingStatus(prev => ({ ...prev, [offerId]: true }));
             const response = await offersAPI.updateOfferStatus(offerId, newStatus);
-            
+
             if (response.success) {
                 toast.success('Offer status updated successfully');
-                
+
                 // Refresh offers data after status update
                 const offersResponse = await offersAPI.getOffers({
                     page: 1,
@@ -153,7 +153,7 @@ function OfferList() {
         return (
             <div className="offer-page">
                 <div className="loading-spinner" style={{ textAlign: 'center', padding: '50px' }}>
-                    <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #2196F3', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' ,textAlign: 'center'}}></div>
+                    <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #2196F3', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px', textAlign: 'center' }}></div>
                     <p>Loading offers...</p>
                 </div>
             </div>
@@ -252,8 +252,8 @@ function OfferList() {
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                             <select
                                                 className={`offer-status-select ${offer.status.toLowerCase()}`}
-                                                value={['live', 'paused', 'suspend'].includes(offer.status.toLowerCase()) 
-                                                    ? offer.status.toLowerCase() 
+                                                value={['live', 'paused', 'suspend'].includes(offer.status.toLowerCase())
+                                                    ? offer.status.toLowerCase()
                                                     : 'live'}
                                                 onChange={(e) => handleStatusChange(offer.id, e.target.value)}
                                                 disabled={updatingStatus[offer.id]}

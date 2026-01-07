@@ -86,6 +86,7 @@ function Dashboard() {
     const { user } = useAuth();
     const { getStats, offers, affiliates } = useData();
     const [dashboardData, setDashboardData] = useState(null);
+    const [dashboardCards, setDashboardCards] = useState(null); // New: Dashboard cards data
     const [topOffers, setTopOffers] = useState([]);
     const [performanceData, setPerformanceData] = useState([]);
     const [topAffiliates, setTopAffiliates] = useState([]);
@@ -96,6 +97,7 @@ function Dashboard() {
     const [publisherData, setPublisherData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [cardsLoading, setCardsLoading] = useState(false); // New: Cards loading state
     const [topOffersLoading, setTopOffersLoading] = useState(false);
     const [performanceLoading, setPerformanceLoading] = useState(false);
     const [topAffiliatesLoading, setTopAffiliatesLoading] = useState(false);
@@ -114,6 +116,7 @@ function Dashboard() {
     const [affiliatesLoading, setAffiliatesLoading] = useState(false);
     const [affiliatesError, setAffiliatesError] = useState(null);
 
+
     // Fetch dashboard data
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -131,6 +134,21 @@ function Dashboard() {
                 setError(err.message || 'Failed to load dashboard data');
             } finally {
                 setLoading(false);
+            }
+        };
+
+        // New: Fetch dashboard cards (optimized endpoint for card data)
+        const fetchDashboardCards = async () => {
+            try {
+                setCardsLoading(true);
+                const response = await dashboardAPI.getDashboardCards();
+                if (response.success) {
+                    setDashboardCards(response.data);
+                }
+            } catch (err) {
+                console.error('Dashboard cards fetch error:', err);
+            } finally {
+                setCardsLoading(false);
             }
         };
 
@@ -265,10 +283,8 @@ function Dashboard() {
                 setOffersError(null);
                 const response = await offersAPI.getOffers({
                     type: 'live',
-                    category: 'Shopping',
-                    advertiser_id: 1,
                     page: 1,
-                    limit: 20
+                    limit: 100
                 });
                 if (response.success) {
                     setOffersData(response.data);
@@ -310,6 +326,7 @@ function Dashboard() {
         };
 
         fetchDashboardData();
+        fetchDashboardCards(); // New: Fetch optimized dashboard cards
         fetchTopOffers();
         fetchTopAffiliates();
         fetchInfoCards();
@@ -321,10 +338,11 @@ function Dashboard() {
         fetchAffiliatesData();
     }, []);
 
-
     // Fallback to local stats if API data not available
     const stats = getStats();
-    const apiStats = dashboardData || {};
+    // Prioritize dashboardCards (optimized endpoint), then dashboardData, then local stats
+    const apiStats = dashboardCards || dashboardData || {};
+
 
     // Format number with commas
     const formatNumber = (num) => {
@@ -472,7 +490,6 @@ function Dashboard() {
                         <span className="stat-value">{formatCurrency(apiStats.revenue?.total || 0)}</span>
                         <span className="stat-label">Total Revenue</span>
                     </div>
-                    <TrendIndicator current={apiStats.revenue?.total || 0} previous={apiStats.revenue?.yesterday || 0} />
                     <div className="stat-badge">
                         Profit: {formatCurrency(apiStats.revenue?.profit || 0)}
                     </div>
@@ -547,7 +564,7 @@ function Dashboard() {
                                         const response = await offersAPI.getOffers({
                                             type: 'live',
                                             page: 1,
-                                            limit: 20
+                                            limit: 100
                                         });
                                         if (response.success) {
                                             setOffersData(response.data);
@@ -566,7 +583,7 @@ function Dashboard() {
                         </div>
                     ) : offersData && offersData.length > 0 ? (
                         <div className="offers-list">
-                            {offersData.slice(0, 5).map(offer => (
+                            {offersData.map(offer => (
                                 <div key={offer.id} className="offer-row">
                                     <div className="offer-info">
                                         <span className="offer-name">{offer.name}</span>
@@ -592,12 +609,12 @@ function Dashboard() {
                         <h3>Top Affiliates</h3>
                         <Link to="/affiliate/manage" className="view-all">View All</Link>
                     </div>
-                    {topAffiliatesLoading ? (
+                    {(topAffiliatesLoading || affiliatesLoading) ? (
                         <div className="loading-spinner">Loading affiliates...</div>
-                    ) : topAffiliates && topAffiliates.length > 0 ? (
+                    ) : (topAffiliates && topAffiliates.length > 0) ? (
                         <div className="affiliates-list">
                             {topAffiliates.map((aff, idx) => (
-                                <div key={aff.publisher_id} className="affiliate-row">
+                                <div key={aff.publisher_id || idx} className="affiliate-row">
                                     <div className="affiliate-rank">#{idx + 1}</div>
                                     <div className="affiliate-avatar">
                                         {(aff.publisher_name || 'A').charAt(0).toUpperCase()}
@@ -608,6 +625,24 @@ function Dashboard() {
                                     </div>
                                     <div className="affiliate-status active">
                                         {formatNumber(aff.conversions || 0)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (affiliatesData && affiliatesData.length > 0) ? (
+                        <div className="affiliates-list">
+                            {affiliatesData.map((aff, idx) => (
+                                <div key={aff.id || idx} className="affiliate-row">
+                                    <div className="affiliate-rank">#{idx + 1}</div>
+                                    <div className="affiliate-avatar">
+                                        {(aff.company_name || aff.first_name || 'A').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="affiliate-info">
+                                        <span className="affiliate-name">{aff.company_name || aff.first_name || 'N/A'}</span>
+                                        <span className="affiliate-email">{aff.email || 'New Affiliate'}</span>
+                                    </div>
+                                    <div className="affiliate-status pending">
+                                        New
                                     </div>
                                 </div>
                             ))}

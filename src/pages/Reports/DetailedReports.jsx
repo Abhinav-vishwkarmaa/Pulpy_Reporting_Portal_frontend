@@ -36,7 +36,7 @@ function DetailedReports() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 1 });
-    
+
     // Filters
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
@@ -133,7 +133,7 @@ function DetailedReports() {
     const handleExport = async () => {
         try {
             setLoading(true);
-            
+
             // Fetch tracking URLs for all reports that have offer_id and publisher_id
             const reportsWithTracking = await Promise.all(
                 filteredReports.map(async (report) => {
@@ -147,7 +147,7 @@ function DetailedReports() {
                                 offer_id: report.offer_id,
                                 publisher_id: report.publisher_id
                             });
-                            
+
                             if (assignmentsResponse.success && assignmentsResponse.data && assignmentsResponse.data.length > 0) {
                                 const assignment = assignmentsResponse.data[0];
                                 if (assignment.id) {
@@ -216,7 +216,7 @@ function DetailedReports() {
             // Convert to CSV format
             const csvContent = [
                 headers.join(','),
-                ...rows.map(row => 
+                ...rows.map(row =>
                     row.map(cell => {
                         // Escape commas and quotes in cell values
                         const cellValue = String(cell || '').replace(/"/g, '""');
@@ -229,18 +229,18 @@ function DetailedReports() {
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
-            
+
             // Generate filename with current date
             const dateStr = new Date().toISOString().split('T')[0];
             const filename = `detailed-reports-${dateStr}.csv`;
-            
+
             link.setAttribute('href', url);
             link.setAttribute('download', filename);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             toast.success(`Exported ${reportsWithTracking.length} records to ${filename}`);
         } catch (error) {
             console.error('Export error:', error);
@@ -368,7 +368,7 @@ function DetailedReports() {
                                 <tr key={report.click_id}>
                                     <td>
                                         <div className="report-id">{report.click_id}</div>
-                                        <div className="report-uuid">{report.click_uuid?.substring(0, 8)}...</div>
+                                        <div className="report-uuid">{report.click_uuid}</div>
                                     </td>
                                     <td>
                                         <div className="report-name">{report.offer_name || `Offer #${report.offer_id}`}</div>
@@ -390,7 +390,7 @@ function DetailedReports() {
                                         {report.conversion_id ? (
                                             <div>
                                                 <div className="report-id">{report.conversion_id}</div>
-                                                <div className="report-uuid">{report.conversion_uuid?.substring(0, 8)}...</div>
+                                                <div className="report-uuid">{report.conversion_uuid}</div>
                                                 {report.conversion_timestamp && (
                                                     <div className="report-meta">{formatDate(report.conversion_timestamp)}</div>
                                                 )}

@@ -20,7 +20,7 @@ const getToken = () => {
 const apiRequest = async (endpoint, options = {}) => {
     const token = getToken();
     const url = `${BASE_URL}${endpoint}`;
-    
+
     const config = {
         ...options,
         headers: {
@@ -33,11 +33,11 @@ const apiRequest = async (endpoint, options = {}) => {
     try {
         const response = await fetch(url, config);
         const data = await response.json();
-        
+
         if (!response.ok) {
             throw new Error(data.message || 'API request failed');
         }
-        
+
         return data;
     } catch (error) {
         throw error;
@@ -59,6 +59,10 @@ export const dashboardAPI = {
     // Main dashboard data (KPI cards)
     getDashboard: async () => {
         return apiRequest('/api/admin/reports/dashboard');
+    },
+    // Dashboard cards - main metrics for UI cards display
+    getDashboardCards: async () => {
+        return apiRequest('/api/admin/reports/dashboard/cards');
     },
     // Top offers with conversions
     getTopOffers: async (params = {}) => {
@@ -108,6 +112,9 @@ export const offersAPI = {
     getOffer: async (id) => {
         return apiRequest(`/api/admin/offers/${id}`);
     },
+    getOfferForEdit: async (id) => {
+        return apiRequest(`/api/admin/offers/${id}/edit`);
+    },
     createOffer: async (data) => {
         return apiRequest('/api/admin/offers', {
             method: 'POST',
@@ -124,6 +131,11 @@ export const offersAPI = {
         return apiRequest(`/api/admin/offers/${id}/status`, {
             method: 'PATCH',
             body: JSON.stringify({ status }),
+        });
+    },
+    deleteOffer: async (id) => {
+        return apiRequest(`/api/admin/offers/${id}`, {
+            method: 'DELETE',
         });
     },
 };
