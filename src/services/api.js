@@ -101,6 +101,11 @@ export const dashboardAPI = {
         const queryString = new URLSearchParams(params).toString();
         return apiRequest(`/api/admin/reports/publisher-conversions?${queryString}`);
     },
+    // New Conversion Logs
+    getConversions: async (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return apiRequest(`/api/admin/reports/conversions?${queryString}`);
+    },
 };
 
 // Offers API
