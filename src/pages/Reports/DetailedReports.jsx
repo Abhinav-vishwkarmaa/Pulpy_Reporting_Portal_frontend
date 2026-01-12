@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import { dashboardAPI, offersAPI, publishersAPI, assignmentsAPI } from '../../services/api';
 import './Reports.css';
@@ -20,12 +20,43 @@ const DownloadIcon = () => (
     </svg>
 );
 
-const EyeIcon = () => (
+const FilterIcon = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-        <circle cx="12" cy="12" r="3" />
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
     </svg>
 );
+
+const AVAILABLE_DIMENSIONS = [
+    { id: 'offer_id', label: 'Offer' },
+    { id: 'publisher_id', label: 'Affiliate' },
+    { id: 'advertiser_id', label: 'Advertiser' },
+    { id: 'date', label: 'Date' },
+    { id: 'hour', label: 'Hour' },
+    { id: 'ip', label: 'IP Address' },
+    { id: 'country', label: 'Country' },
+    { id: 'isp', label: 'ISP' },
+    { id: 'city', label: 'City' },
+    { id: 'region', label: 'Region' },
+    { id: 'tid', label: 'TID' },
+    { id: 'user_agent', label: 'User Agent' },
+    { id: 'domain', label: 'Domain' },
+    { id: 'device_type', label: 'Device Type' },
+    { id: 'os', label: 'OS' },
+    { id: 'browser', label: 'Browser' },
+    { id: 'click_uuid', label: 'Click UUID' },
+    { id: 'rcid', label: 'RCID' },
+    { id: 'referer', label: 'Referer' }
+];
+
+const AVAILABLE_METRICS = [
+    { id: 'clicks', label: 'Clicks' },
+    { id: 'unique_clicks', label: 'Unique Clicks' },
+    { id: 'impressions', label: 'Impressions' },
+    { id: 'conversions', label: 'Conversions' },
+    { id: 'revenue', label: 'Offer Price' },
+    { id: 'payout', label: 'Payout' },
+    { id: 'profit', label: 'Profit' }
+];
 
 function DetailedReports() {
     const toast = useToast();
@@ -35,17 +66,35 @@ function DetailedReports() {
     const [publishers, setPublishers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 1 });
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [isAggregated, setIsAggregated] = useState(false);
 
-    // Filters
-    const [dateFrom, setDateFrom] = useState('');
-    const [dateTo, setDateTo] = useState('');
-    const [offerFilter, setOfferFilter] = useState('all');
-    const [publisherFilter, setPublisherFilter] = useState('all');
-    const [statusFilter, setStatusFilter] = useState('all');
-    const [searchTerm, setSearchTerm] = useState('');
+    // Initial state from URL params
+    const [pagination, setPagination] = useState({
+        page: parseInt(searchParams.get('page') || '1'),
+        limit: parseInt(searchParams.get('limit') || '50'),
+        total: 0,
+        totalPages: 1
+    });
 
-    // Fetch offers and publishers for filters
+    const [dateFrom, setDateFrom] = useState(searchParams.get('date_from') || '');
+    const [dateTo, setDateTo] = useState(searchParams.get('date_to') || '');
+    const [offerFilter, setOfferFilter] = useState(searchParams.get('offer_id') || 'all');
+    const [publisherFilter, setPublisherFilter] = useState(searchParams.get('publisher_id') || 'all');
+    const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+
+    // Checkbox selections
+    const initialDims = searchParams.get('groupBy') ? searchParams.get('groupBy').split(',') : [];
+    const initialMetrics = searchParams.get('metrics') ? searchParams.get('metrics').split(',') : ['clicks', 'conversions', 'revenue'];
+
+    // If URL has no group params, default to Detailed View (empty group)
+    const [selectedDims, setSelectedDims] = useState(initialDims);
+    const [selectedMetrics, setSelectedMetrics] = useState(initialMetrics);
+
+    const [showFilters, setShowFilters] = useState(true);
+
+    // Fetch filter options
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -62,66 +111,103 @@ function DetailedReports() {
         fetchData();
     }, []);
 
-    // Fetch reports data
-    useEffect(() => {
-        const fetchReports = async () => {
-            try {
-                setLoading(true);
-                setError(null);
+    const fetchReports = async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-                const params = {
-                    page: pagination.page,
-                    limit: pagination.limit
-                };
+            const params = {
+                page: pagination.page,
+                limit: pagination.limit
+            };
 
-                if (dateFrom) params.date_from = dateFrom;
-                if (dateTo) params.date_to = dateTo;
-                if (offerFilter !== 'all') params.offer_id = offerFilter;
-                if (publisherFilter !== 'all') params.publisher_id = publisherFilter;
-                if (statusFilter !== 'all') params.status = statusFilter;
+            if (dateFrom) params.date_from = dateFrom;
+            if (dateTo) params.date_to = dateTo;
+            if (offerFilter !== 'all') params.offer_id = offerFilter;
+            if (publisherFilter !== 'all') params.publisher_id = publisherFilter;
+            if (statusFilter !== 'all') params.status = statusFilter;
+            if (searchTerm) params.search = searchTerm;
 
-                const response = await dashboardAPI.getDetailed(params);
-                if (response.success) {
-                    setReports(response.data || []);
-                    if (response.pagination) {
-                        setPagination(response.pagination);
-                    }
-                } else {
-                    setError('Failed to load reports');
-                }
-            } catch (err) {
-                console.error('Reports fetch error:', err);
-                setError(err.message || 'Failed to load reports');
-            } finally {
-                setLoading(false);
+            // Grouping Logic
+            if (selectedDims.length > 0) {
+                params.groupBy = selectedDims.join(',');
+                // If specific metrics selected, backend needs to support limiting metrics or we filter on frontend?
+                // For now, backend returns ALL metrics if aggregated. We can filter display on frontend.
             }
-        };
+            // If No GroupBy, DetailedReports returns specific columns.
 
+            // Sync URL
+            const urlParams = new URLSearchParams();
+            urlParams.set('page', params.page);
+            urlParams.set('limit', params.limit);
+            if (dateFrom) urlParams.set('date_from', dateFrom);
+            if (dateTo) urlParams.set('date_to', dateTo);
+            if (offerFilter !== 'all') urlParams.set('offer_id', offerFilter);
+            if (publisherFilter !== 'all') urlParams.set('publisher_id', publisherFilter);
+            if (statusFilter !== 'all') urlParams.set('status', statusFilter);
+            if (searchTerm) urlParams.set('search', searchTerm);
+            if (selectedDims.length > 0) urlParams.set('groupBy', selectedDims.join(','));
+            if (selectedMetrics.length > 0) urlParams.set('metrics', selectedMetrics.join(','));
+            setSearchParams(urlParams);
+
+            const response = await dashboardAPI.getDetailed(params);
+            if (response.success) {
+                setReports(response.data || []);
+                setIsAggregated(response.isAggregated || false);
+                if (response.pagination) {
+                    setPagination(response.pagination);
+                }
+            } else {
+                setError('Failed to load reports');
+            }
+        } catch (err) {
+            console.error('Reports fetch error:', err);
+            setError(err.message || 'Failed to load reports');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Initial load
+    useEffect(() => {
         fetchReports();
-    }, [pagination.page, pagination.limit, dateFrom, dateTo, offerFilter, publisherFilter, statusFilter]);
+    }, [pagination.page, pagination.limit]);
 
-    const filteredReports = reports.filter(report => {
-        const matchesSearch =
-            report.offer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            report.publisher_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            report.publisher_company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            report.click_uuid?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (report.conversion_uuid && report.conversion_uuid.toLowerCase().includes(searchTerm.toLowerCase()));
-        return matchesSearch;
-    });
+    const handleApply = () => {
+        setPagination(prev => ({ ...prev, page: 1 }));
+        fetchReports();
+    };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '-';
-        return new Date(dateString).toLocaleString();
+    const handleDimChange = (id) => {
+        setSelectedDims(prev => {
+            if (prev.includes(id)) return prev.filter(item => item !== id);
+            return [...prev, id];
+        });
+    };
+
+    const handleMetricChange = (id) => {
+        setSelectedMetrics(prev => {
+            if (prev.includes(id)) return prev.filter(item => item !== id);
+            return [...prev, id];
+        });
     };
 
     const formatCurrency = (amount) => {
-        if (!amount) return '-';
+        if (amount === undefined || amount === null) return '-';
         return `$${parseFloat(amount).toFixed(2)}`;
     };
 
+    const formatDate = (dateString, dim) => {
+        if (!dateString) return '-';
+        if (dim === 'hour') return `${dateString}:00`;
+        if (dim === 'date') return new Date(dateString).toLocaleDateString();
+        try {
+            return new Date(dateString).toLocaleString();
+        } catch (e) { return dateString; }
+    };
+
     const getStatusBadge = (status) => {
-        if (!status) return <span className="report-status no-conversion">No Conversion</span>;
+        if (!status) return null;
         const statusClass = status.toLowerCase();
         return <span className={`report-status ${statusClass}`}>{status}</span>;
     };
@@ -132,319 +218,249 @@ function DetailedReports() {
 
     const handleExport = async () => {
         try {
-            setLoading(true);
+            toast.info('Preparing export...');
 
-            // Fetch tracking URLs for all reports that have offer_id and publisher_id
-            const reportsWithTracking = await Promise.all(
-                filteredReports.map(async (report) => {
-                    let trackingUrl = '';
-                    if (report.offer_id && report.publisher_id) {
-                        try {
-                            // Try to get assignment ID first, then tracking URL
-                            // Since we don't have assignment_id in the report, we'll construct a basic tracking URL
-                            // or try to fetch from assignments API
-                            const assignmentsResponse = await assignmentsAPI.getAssignments({
-                                offer_id: report.offer_id,
-                                publisher_id: report.publisher_id
-                            });
+            const params = new URLSearchParams();
+            if (dateFrom) params.set('date_from', dateFrom);
+            if (dateTo) params.set('date_to', dateTo);
+            if (offerFilter !== 'all') params.set('offer_id', offerFilter);
+            if (publisherFilter !== 'all') params.set('publisher_id', publisherFilter);
+            if (statusFilter !== 'all') params.set('status', statusFilter);
+            if (searchTerm) params.set('search', searchTerm);
+            if (selectedDims.length > 0) params.set('groupBy', selectedDims.join(','));
+            if (selectedMetrics.length > 0) params.set('columns', selectedMetrics.join(','));
 
-                            if (assignmentsResponse.success && assignmentsResponse.data && assignmentsResponse.data.length > 0) {
-                                const assignment = assignmentsResponse.data[0];
-                                if (assignment.id) {
-                                    const trackingResponse = await assignmentsAPI.getTrackingUrl(assignment.id);
-                                    if (trackingResponse.success) {
-                                        trackingUrl = trackingResponse.data.tracking_url || '';
-                                    }
-                                }
-                            }
-                        } catch (err) {
-                            console.error(`Error fetching tracking URL for offer ${report.offer_id}, publisher ${report.publisher_id}:`, err);
-                        }
-                    }
-                    return { ...report, tracking_url: trackingUrl };
-                })
-            );
+            params.set('export', 'csv');
 
-            // Prepare CSV headers
-            const headers = [
-                'Click ID',
-                'Click UUID',
-                'Offer ID',
-                'Offer Name',
-                'Publisher ID',
-                'Publisher Email',
-                'Publisher Company',
-                'IP Address',
-                'User Agent',
-                'Device Type',
-                'Browser',
-                'OS',
-                'Click Timestamp',
-                'Conversion ID',
-                'Conversion UUID',
-                'Conversion Status',
-                'Conversion Amount',
-                'Conversion Payout',
-                'Conversion Timestamp',
-                'Tracking URL'
-            ];
+            // Direct download link logic
+            // We use fetch with blob to handle auth headers if needed, or just window.open if cookies usage
+            // Since we use Bearer token, we must use fetch
 
-            // Prepare CSV rows
-            const rows = reportsWithTracking.map(report => [
-                report.click_id || '',
-                report.click_uuid || '',
-                report.offer_id || '',
-                report.offer_name || '',
-                report.publisher_id || '',
-                report.publisher_email || '',
-                report.publisher_company || '',
-                report.ip || '',
-                report.user_agent || '',
-                report.device_type || '',
-                report.browser || '',
-                report.os || '',
-                report.click_timestamp || '',
-                report.conversion_id || '',
-                report.conversion_uuid || '',
-                report.conversion_status || 'No Conversion',
-                report.conversion_amount || '',
-                report.conversion_payout || '',
-                report.conversion_timestamp || '',
-                report.tracking_url || ''
-            ]);
+            const token = localStorage.getItem('bng_user') ? JSON.parse(localStorage.getItem('bng_user')).token : null;
 
-            // Convert to CSV format
-            const csvContent = [
-                headers.join(','),
-                ...rows.map(row =>
-                    row.map(cell => {
-                        // Escape commas and quotes in cell values
-                        const cellValue = String(cell || '').replace(/"/g, '""');
-                        return `"${cellValue}"`;
-                    }).join(',')
-                )
-            ].join('\n');
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/admin/reports/detailed?${params.toString()}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
-            // Create blob and download
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
+            if (!response.ok) throw new Error('Export failed');
 
-            // Generate filename with current date
-            const dateStr = new Date().toISOString().split('T')[0];
-            const filename = `detailed-reports-${dateStr}.csv`;
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `report-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
 
-            link.setAttribute('href', url);
-            link.setAttribute('download', filename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            toast.success(`Exported ${reportsWithTracking.length} records to ${filename}`);
+            toast.success('Export downloaded!');
         } catch (error) {
             console.error('Export error:', error);
-            toast.error('Failed to export reports');
-        } finally {
-            setLoading(false);
+            toast.error('Failed to export data');
         }
     };
 
-    if (loading && reports.length === 0) {
-        return (
-            <div className="reports-page">
-                <div className="loading-spinner" style={{ textAlign: 'center', padding: '50px' }}>
-                    <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #2196F3', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }}></div>
-                    <p>Loading reports...</p>
-                </div>
-            </div>
-        );
-    }
+    // Dynamic Columns Helper
+    const tableColumns = useMemo(() => {
+        if (isAggregated) {
+            const cols = [];
+            // Dimensions first - order matters based on selection
+            // We want to sort dimensions based on AVAILABLE_DIMENSIONS order for consistency
+            AVAILABLE_DIMENSIONS.forEach(dim => {
+                if (selectedDims.includes(dim.id)) {
+                    cols.push({ id: dim.id === 'date' ? 'date_group' : (dim.id === 'hour' ? 'hour_group' : dim.id), label: dim.label });
+                }
+            });
+
+            // Metrics
+            AVAILABLE_METRICS.forEach(metric => {
+                if (selectedMetrics.includes(metric.id)) {
+                    cols.push({ id: metric.id, label: metric.label });
+                }
+            });
+            return cols;
+        } else {
+            // Detailed View Columns
+            return [
+                { id: 'click_uuid', label: 'Click UUID' },
+                { id: 'offer_name', label: 'Offer' },
+                { id: 'publisher_company', label: 'Affiliate' },
+                { id: 'ip', label: 'IP' },
+                { id: 'country', label: 'Country' },
+                { id: 'device_type', label: 'Device' },
+                { id: 'click_created_at', label: 'Time' },
+                { id: 'conversion_status', label: 'Status' },
+                { id: 'conversion_amount', label: 'Revenue' },
+                { id: 'conversion_payout', label: 'Payout' }
+            ];
+        }
+    }, [isAggregated, selectedDims, selectedMetrics]);
 
     return (
         <div className="reports-page">
             <div className="reports-header">
                 <div className="reports-header-left">
                     <h1>Detailed Reports</h1>
-                    <p>View detailed click and conversion reports</p>
+                    <p>Customizable performance reports</p>
                 </div>
-                <button className="btn btn-primary" onClick={handleExport}>
-                    <DownloadIcon />
-                    Export
-                </button>
+                <div className="reports-header-actions">
+                    <button className="btn btn-outline" onClick={() => setShowFilters(!showFilters)}>
+                        <FilterIcon /> {showFilters ? 'Hide Filters' : 'Show Filters'}
+                    </button>
+                    <button className="btn btn-primary" onClick={handleExport}>
+                        <DownloadIcon /> Export CSV
+                    </button>
+                </div>
             </div>
 
-            <div className="reports-filters">
-                <div className="reports-search">
-                    <SearchIcon />
-                    <input
-                        type="text"
-                        placeholder="Search by offer, publisher, click ID, conversion ID..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <input
-                    type="date"
-                    className="form-control"
-                    value={dateFrom}
-                    onChange={(e) => setDateFrom(e.target.value)}
-                    placeholder="Date From"
-                />
-                <input
-                    type="date"
-                    className="form-control"
-                    value={dateTo}
-                    onChange={(e) => setDateTo(e.target.value)}
-                    placeholder="Date To"
-                />
-                <select
-                    className="form-control reports-filter-select"
-                    value={offerFilter}
-                    onChange={(e) => setOfferFilter(e.target.value)}
-                >
-                    <option value="all">All Offers</option>
-                    {offers.map(offer => (
-                        <option key={offer.id} value={offer.id}>{offer.name}</option>
-                    ))}
-                </select>
-                <select
-                    className="form-control reports-filter-select"
-                    value={publisherFilter}
-                    onChange={(e) => setPublisherFilter(e.target.value)}
-                >
-                    <option value="all">All Publishers</option>
-                    {publishers.map(publisher => (
-                        <option key={publisher.id} value={publisher.id}>
-                            {publisher.first_name} ({publisher.email})
-                        </option>
-                    ))}
-                </select>
-                <select
-                    className="form-control reports-filter-select"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                    <option value="all">All Status</option>
-                    <option value="approved">Approved</option>
-                    <option value="pending">Pending</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="no-conversion">No Conversion</option>
-                </select>
-            </div>
+            {showFilters && (
+                <div className="reports-options-panel">
+                    <div className="filters-row">
+                        <div className="filter-group">
+                            <label>Date Range</label>
+                            <div className="date-inputs">
+                                <input type="date" className="form-control" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
+                                <span className="separator">to</span>
+                                <input type="date" className="form-control" value={dateTo} onChange={e => setDateTo(e.target.value)} />
+                            </div>
+                        </div>
+                        <div className="filter-group">
+                            <label>Offer</label>
+                            <select className="form-control" value={offerFilter} onChange={e => setOfferFilter(e.target.value)}>
+                                <option value="all">All Offers</option>
+                                {offers.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="filter-group">
+                            <label>Affiliate</label>
+                            <select className="form-control" value={publisherFilter} onChange={e => setPublisherFilter(e.target.value)}>
+                                <option value="all">All Affiliates</option>
+                                {publishers.map(p => <option key={p.id} value={p.id}>{p.company_name} ({p.email})</option>)}
+                            </select>
+                        </div>
+                        <div className="filter-group">
+                            <label>Status</label>
+                            <select className="form-control" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+                                <option value="all">All Status</option>
+                                <option value="approved">Approved</option>
+                                <option value="pending">Pending</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div className="filter-group">
+                            <label>Search</label>
+                            <input type="text" className="form-control" placeholder="Search..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                        </div>
+                    </div>
 
-            {error && (
-                <div className="error-state" style={{ textAlign: 'center', padding: '20px', marginBottom: '20px', background: '#ffebee', borderRadius: '8px', color: '#F44336' }}>
-                    <p>Error: {error}</p>
+                    <div className="columns-grid-container">
+                        <div className="columns-section">
+                            <h4>Dimensions (Group By)</h4>
+                            <div className="checkbox-grid">
+                                {AVAILABLE_DIMENSIONS.map(dim => (
+                                    <label key={dim.id} className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedDims.includes(dim.id)}
+                                            onChange={() => handleDimChange(dim.id)}
+                                        />
+                                        {dim.label}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="columns-section">
+                            <h4>Metrics</h4>
+                            <div className="checkbox-grid">
+                                {AVAILABLE_METRICS.map(metric => (
+                                    <label key={metric.id} className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedMetrics.includes(metric.id)}
+                                            onChange={() => handleMetricChange(metric.id)}
+                                        />
+                                        {metric.label}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="filter-actions">
+                        <button className="btn btn-secondary" onClick={() => { setSelectedDims([]); setSelectedMetrics(['clicks', 'conversions', 'revenue']); }}>Reset</button>
+                        <button className="btn btn-primary" onClick={handleApply} style={{ minWidth: '150px' }}>Apply Report</button>
+                    </div>
                 </div>
             )}
 
             <div className="reports-table-container">
-                <table className="reports-table">
-                    <thead>
-                        <tr>
-                            <th>Click ID</th>
-                            <th>Offer</th>
-                            <th>Publisher</th>
-                            <th>IP Address</th>
-                            <th>Device</th>
-                            <th>Click Time</th>
-                            <th>Conversion</th>
-                            <th>Status</th>
-                            <th>Amount</th>
-                            <th>Payout</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredReports.length === 0 ? (
+                {loading ? (
+                    <div className="loading-spinner" style={{ textAlign: 'center', padding: '50px' }}>
+                        <div style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #2196F3', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }}></div>
+                        <p>Loading...</p>
+                    </div>
+                ) : (
+                    <table className="reports-table">
+                        <thead>
                             <tr>
-                                <td colSpan="11" style={{ textAlign: 'center', padding: '40px' }}>
-                                    No reports found
-                                </td>
+                                {tableColumns.map(col => (
+                                    <th key={col.id}>{col.label}</th>
+                                ))}
                             </tr>
-                        ) : (
-                            filteredReports.map((report) => (
-                                <tr key={report.click_id}>
-                                    <td>
-                                        <div className="report-id">{report.click_id}</div>
-                                        <div className="report-uuid">{report.click_uuid}</div>
-                                    </td>
-                                    <td>
-                                        <div className="report-name">{report.offer_name || `Offer #${report.offer_id}`}</div>
-                                    </td>
-                                    <td>
-                                        <div className="report-name">{report.publisher_email || `Publisher #${report.publisher_id}`}</div>
-                                        <div className="report-email">{report.publisher_company || '-'}</div>
-                                    </td>
-                                    <td>{report.ip || '-'}</td>
-                                    <td>
-                                        <div>{report.device_type || '-'}</div>
-                                        {report.browser && <div className="report-meta">{report.browser}</div>}
-                                        {report.os && <div className="report-meta">{report.os}</div>}
-                                    </td>
-                                    <td>
-                                        <div>{formatDate(report.click_timestamp)}</div>
-                                    </td>
-                                    <td>
-                                        {report.conversion_id ? (
-                                            <div>
-                                                <div className="report-id">{report.conversion_id}</div>
-                                                <div className="report-uuid">{report.conversion_uuid}</div>
-                                                {report.conversion_timestamp && (
-                                                    <div className="report-meta">{formatDate(report.conversion_timestamp)}</div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <span className="report-meta">-</span>
-                                        )}
-                                    </td>
-                                    <td>{getStatusBadge(report.conversion_status)}</td>
-                                    <td>{formatCurrency(report.conversion_amount)}</td>
-                                    <td>{formatCurrency(report.conversion_payout)}</td>
-                                    <td>
-                                        <div className="reports-actions">
-                                            <button
-                                                className="reports-action-btn"
-                                                title="View Details"
-                                                onClick={() => navigate(`/offer/detail/${report.offer_id}`)}
-                                            >
-                                                <EyeIcon />
-                                            </button>
-                                        </div>
-                                    </td>
+                        </thead>
+                        <tbody>
+                            {reports.length === 0 ? (
+                                <tr>
+                                    <td colSpan={tableColumns.length} style={{ textAlign: 'center', padding: '40px' }}>No data found</td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ) : (
+                                reports.map((row, idx) => (
+                                    <tr key={idx}>
+                                        {tableColumns.map(col => {
+                                            const val = row[col.id];
+                                            if (['revenue', 'payout', 'profit', 'conversion_amount', 'conversion_payout'].includes(col.id)) return <td key={col.id}>{formatCurrency(val)}</td>;
+                                            if (col.id === 'conversion_status') return <td key={col.id}>{getStatusBadge(val)}</td>;
+                                            if (col.id === 'click_created_at') return <td key={col.id}>{formatDate(val)}</td>;
+                                            if (col.id === 'date_group' || col.id === 'hour_group') {
+                                                return <td key={col.id}>{val}</td>;
+                                            }
+                                            return <td key={col.id}>{val !== undefined && val !== null ? val : '-'}</td>;
+                                        })}
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </div>
-
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
-                <div className="reports-pagination">
-                    <button
-                        className="btn btn-outline"
-                        onClick={() => handlePageChange(pagination.page - 1)}
-                        disabled={pagination.page === 1}
-                    >
-                        Previous
-                    </button>
-                    <span className="pagination-info">
-                        Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
-                    </span>
-                    <button
-                        className="btn btn-outline"
-                        onClick={() => handlePageChange(pagination.page + 1)}
-                        disabled={pagination.page >= pagination.totalPages}
-                    >
-                        Next
-                    </button>
-                </div>
-            )}
+            {
+                pagination.totalPages > 1 && (
+                    <div className="reports-pagination">
+                        <button
+                            className="btn btn-outline"
+                            onClick={() => handlePageChange(pagination.page - 1)}
+                            disabled={pagination.page === 1}
+                        >
+                            Previous
+                        </button>
+                        <span className="pagination-info">
+                            Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
+                        </span>
+                        <button
+                            className="btn btn-outline"
+                            onClick={() => handlePageChange(pagination.page + 1)}
+                            disabled={pagination.page >= pagination.totalPages}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )
+            }
         </div>
     );
 }
 
 export default DetailedReports;
-

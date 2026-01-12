@@ -70,6 +70,11 @@ function OfferDetail() {
     const [savingAssignments, setSavingAssignments] = useState(false);
     const [loadingTrackingUrls, setLoadingTrackingUrls] = useState({});
 
+    // New states for granular data
+    const [stats, setStats] = useState(null);
+    const [dailyStats, setDailyStats] = useState([]);
+    const [loadingStats, setLoadingStats] = useState(false);
+
     useEffect(() => {
         const fetchOfferDetails = async () => {
             try {
@@ -89,7 +94,28 @@ function OfferDetail() {
             }
         };
 
-        fetchOfferDetails();
+        const fetchStats = async () => {
+            if (!id) return;
+            try {
+                setLoadingStats(true);
+                const [statsRes, dailyRes] = await Promise.all([
+                    offersAPI.getOfferStats(id),
+                    offersAPI.getOfferDailyStats(id)
+                ]);
+
+                if (statsRes.success) setStats(statsRes.data);
+                if (dailyRes.success) setDailyStats(dailyRes.data);
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            } finally {
+                setLoadingStats(false);
+            }
+        };
+
+        if (id) {
+            fetchOfferDetails();
+            fetchStats();
+        }
     }, [id]);
 
     // Fetch publishers
@@ -252,31 +278,65 @@ function OfferDetail() {
             </div>
 
             {/* Statistics Cards */}
-            {offer.statistics && (
+            {/* Statistics Cards */}
+            {loadingStats ? (
+                <div style={{ textAlign: 'center', padding: '20px' }}>Loading statistics...</div>
+            ) : stats && (
                 <div className="offer-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' }}>
                     <div className="stat-card" style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="stat-label" style={{ color: '#666', fontSize: '14px', marginBottom: '8px' }}>Total Clicks</div>
-                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#2196F3' }}>{offer.statistics.total_clicks || 0}</div>
+                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#2196F3' }}>{stats.total_clicks || 0}</div>
                     </div>
                     <div className="stat-card" style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="stat-label" style={{ color: '#666', fontSize: '14px', marginBottom: '8px' }}>Total Conversions</div>
-                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#4CAF50' }}>{offer.statistics.total_conversions || 0}</div>
+                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#4CAF50' }}>{stats.total_conversions || 0}</div>
                     </div>
                     <div className="stat-card" style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <div className="stat-label" style={{ color: '#666', fontSize: '14px', marginBottom: '8px' }}>Conversion Rate</div>
-                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#FF9800' }}>{offer.statistics.conversion_rate?.toFixed(2) || '0.00'}%</div>
+                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#FF9800' }}>{stats.conversion_rate?.toFixed(2) || '0.00'}%</div>
                     </div>
                     <div className="stat-card" style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="stat-label" style={{ color: '#666', fontSize: '14px', marginBottom: '8px' }}>Total Revenue</div>
-                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#2196F3' }}>{offer.offer_currency} {offer.statistics.total_revenue || '0.00'}</div>
+                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#2196F3' }}>{offer.offer_currency} {stats.total_revenue || '0.00'}</div>
                     </div>
                     <div className="stat-card" style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="stat-label" style={{ color: '#666', fontSize: '14px', marginBottom: '8px' }}>Total Payout</div>
-                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#4CAF50' }}>{offer.offer_currency} {offer.statistics.total_payout || '0.00'}</div>
+                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#4CAF50' }}>{offer.offer_currency} {stats.total_payout || '0.00'}</div>
                     </div>
                     <div className="stat-card" style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                         <div className="stat-label" style={{ color: '#666', fontSize: '14px', marginBottom: '8px' }}>Total Profit</div>
-                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#9C27B0' }}>{offer.offer_currency} {offer.statistics.total_profit || '0.00'}</div>
+                        <div className="stat-value" style={{ fontSize: '24px', fontWeight: 'bold', color: '#9C27B0' }}>{offer.offer_currency} {stats.total_profit || '0.00'}</div>
+                    </div>
+                </div>
+            )}
+
+            {/* Daily Activity */}
+            {dailyStats && dailyStats.length > 0 && (
+                <div className="offer-detail-section" style={{ background: '#fff', padding: '25px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '30px' }}>
+                    <h2 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: '600' }}>Daily Activity</h2>
+                    <div className="table-responsive">
+                        <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '2px solid #f0f0f0' }}>
+                                    <th style={{ padding: '12px', textAlign: 'left', color: '#666' }}>Date</th>
+                                    <th style={{ padding: '12px', textAlign: 'right', color: '#666' }}>Clicks</th>
+                                    <th style={{ padding: '12px', textAlign: 'right', color: '#666' }}>Conversions</th>
+                                    <th style={{ padding: '12px', textAlign: 'right', color: '#666' }}>Conversion Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {dailyStats.map((day, index) => (
+                                    <tr key={index} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                                        <td style={{ padding: '12px' }}>{formatDate(day.date)}</td>
+                                        <td style={{ padding: '12px', textAlign: 'right' }}>{day.clicks}</td>
+                                        <td style={{ padding: '12px', textAlign: 'right' }}>{day.conversions}</td>
+                                        <td style={{ padding: '12px', textAlign: 'right' }}>
+                                            {day.clicks > 0 ? ((day.conversions / day.clicks) * 100).toFixed(2) : '0.00'}%
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             )}

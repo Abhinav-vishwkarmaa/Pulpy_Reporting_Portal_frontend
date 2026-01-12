@@ -112,6 +112,25 @@ export const offersAPI = {
     getOffer: async (id) => {
         return apiRequest(`/api/admin/offers/${id}`);
     },
+    getOfferStats: async (id) => {
+        return apiRequest(`/api/admin/offers/${id}/stats`);
+    },
+    getOfferDailyStats: async (id, params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return apiRequest(`/api/admin/offers/${id}/daily-stats?${queryString}`);
+    },
+    getOfferAssignments: async (id) => {
+        return apiRequest(`/api/admin/offers/${id}/assignments`);
+    },
+    getOfferRecentClicks: async (id) => {
+        return apiRequest(`/api/admin/offers/${id}/recent-clicks`);
+    },
+    getOfferRecentConversions: async (id) => {
+        return apiRequest(`/api/admin/offers/${id}/recent-conversions`);
+    },
+    getOfferPublisherStats: async (id) => {
+        return apiRequest(`/api/admin/offers/${id}/publisher-stats`);
+    },
     getOfferForEdit: async (id) => {
         return apiRequest(`/api/admin/offers/${id}/edit`);
     },
