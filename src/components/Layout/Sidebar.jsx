@@ -175,7 +175,7 @@ function Sidebar({ collapsed, mobileOpen, onCloseMobile }) {
         },
         {
             type: 'link',
-            path: '/logs',
+            path: '/live-logs',
             icon: <LogsIcon />, // Using ReportsIcon SVG pattern but as distinct Component
             text: 'Live Logs'
         },

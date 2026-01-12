@@ -19,7 +19,7 @@ import NewAssignment from './pages/Assignment/NewAssignment';
 import EditAssignment from './pages/Assignment/EditAssignment';
 import DetailedReports from './pages/Reports/DetailedReports';
 import UpdateProfile from './pages/Settings/UpdateProfile';
-import Logs from './pages/Logs/Logs';
+import LiveLogs from './pages/LiveLogs/LiveLogs';
 import ImportData from './pages/Import/ImportData';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -79,7 +79,7 @@ function AppRoutes() {
           <Route index element={<UpdateProfile />} />
           <Route path="profile" element={<UpdateProfile />} />
         </Route>
-        <Route path="logs" element={<Logs />} />
+        <Route path="live-logs" element={<LiveLogs />} />
         <Route path="import" element={<ImportData />} />
       </Route>
     </Routes>
